@@ -1,5 +1,9 @@
-(torch_zhangsh) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/HONOR# /opt/nas/p/conda/envs/torch_zhangsh/bin/python /opt/nas/p/mm/ie_env/HONOR/inferece.py
-Traceback (most recent call last):
-  File "/opt/nas/p/mm/ie_env/HONOR/inferece.py", line 2, in <module>
-    from .utils.model import Qwen2VLChat
-ImportError: attempted relative import with no known parent package
+(torch_zhangsh) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/HONOR# ls
+assets  inferece.py  model  utils
+(torch_zhangsh) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/HONOR# cd utils
+(torch_zhangsh) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/HONOR/utils# ls
+dataset  __init__.py  model  smp
+(torch_zhangsh) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/HONOR/utils# cd model
+(torch_zhangsh) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/HONOR/utils/model# ls
+base.py  __init__.py  model.py  prompt.py  __pycache__  vision_process.py
+(torch_zhangsh) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/HONOR/utils/model# 
