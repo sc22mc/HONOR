@@ -1,50 +1,19 @@
-def evaluate(self, eval_file, **judge_kwargs):
-        infer_dataset = load(eval_file)
-
-        rank, world_size = get_rank_and_world_size()
-        if self.EVALUATE_METHOD == 'RULE':
-            if rank == 0:
-                res = self.evaluate_by_rule(infer_dataset, eval_file)
-
-        elif self.EVALUATE_METHOD == 'LLM':
-            res = self.evaluate_by_llm(infer_dataset, eval_file)
-
-        else:
-            raise Exception
-
-        if rank != 0:
-            return None
-        
-        self.calculate_results(eval_file, infer_dataset, res)
-        
-    def calculate_results(self, eval_file, infer_dataset, res):
-        lines = [infer_dataset.iloc[i] for i in range(len(infer_dataset))]
-        hit = self.hit_calculate(res, self.dataset_name)
-        ret = dict()
-        if 'split' in infer_dataset:
-            splits = set(infer_dataset['split'])
-            for sp in splits:
-                sub = [r for l, r in zip(lines, res) if l['split'] == sp]
-                # [np.mean(x['match']) >= full_score_weight for x in sub]
-                hit = self.hit_calculate(sub, self.dataset_name)
-                ret[sp] = np.mean(hit) * 100
-            sub = [r for l, r in zip(lines, res)]
-            hit = self.hit_calculate(sub, self.dataset_name)
-            ret['Overall'] = np.mean(hit) * 100
-        else:
-            ret['Overall'] = np.mean(hit) * 100
-            if 'category' in infer_dataset:
-                cates = list(set(infer_dataset['category']))
-                cates.sort()
-                for c in cates:
-                    sub = [r for l, r in zip(lines, res) if l['category'] == c]
-                    # [np.mean(x['match']) >= full_score_weight for x in sub]
-                    hit = self.hit_calculate(sub, self.dataset_name)
-                    ret[c] = np.mean(hit) * 100
-        ret = d2df(ret)
-        ret.round(2)
-
-        suffix = eval_file.split('.')[-1]
-        result_file = eval_file.replace(f'.{suffix}', '_acc.csv')
-        dump(ret, result_file)
-        return ret
+(cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/VLMEvalKit# lmdeploy serve api_server /opt/nas/p/mm/ie_env/VLMEvalKit/models/Qwen2-VL
+-7B-Instruct --server-port 23333
+2025-07-08 11:19:52,247 - lmdeploy - WARNING - archs.py:51 - Fallback to pytorch engine because `/opt/nas/p/mm/ie_env/VLMEvalKit/models/Qwen2-VL-7B-Instruct` not supported by turbomind engine.
+Using a slow image processor as `use_fast` is unset and a slow processor was saved with this model. `use_fast=True` will be the default behavior in v4.52, even if the model was saved with a slow processor. This will result in minor differences in outputs. You'll still be able to use a slow processor with `use_fast=False`.
+You have video processor config saved in `preprocessor.json` file which is deprecated. Video processor configs should be saved in their own `video_preprocessor.json` file. You can rename the file or load and save the processor back which renames it automatically. Loading from `preprocessor.json` will be removed in v5.0.
+huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
+To disable this warning, you can either:
+        - Avoid using `tokenizers` before the fork if possible
+        - Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+2025-07-08 11:20:26,869 - lmdeploy - WARNING - __init__.py:10 - Disable DLSlime Backend
+Loading weights from safetensors: 100%|██████████████████████████████████████████████████████████████████████| 5/5 [00:16<00:00,  3.32s/it]
+HINT:    Please open http://0.0.0.0:23333 in a browser for detailed api usage!!!
+HINT:    Please open http://0.0.0.0:23333 in a browser for detailed api usage!!!
+HINT:    Please open http://0.0.0.0:23333 in a browser for detailed api usage!!!
+INFO:     Started server process [3602229]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:23333 (Press CTRL+C to quit)
+INFO:     127.0.0.1:48632 - "GET / HTTP/1.1" 200 OK
