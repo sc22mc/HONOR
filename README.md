@@ -1,155 +1,318 @@
 from __future__ import annotations
 
+import os
+import sys
+import warnings
+import math
+import logging
+import re
 
-class Qwen2VLPromptMixin:
-    """
-    Mixin class for Qwen2VLChat to build custom prompt for different datasets.
+import torch
 
-    Requires the following methods to be implemented in the subclass:
-        - dump_image(line, dataset: str) -> str | list[str]
+from . import BaseModel, Qwen2VLPromptMixin
+from ..smp import get_rank_and_world_size, get_gpu_memory, auto_split_flag
 
-    Implements the following methods:
-        - use_custom_prompt(dataset: str) -> bool
-        - build_prompt(line, dataset: str) -> list[dict[str, str]]
-    """
 
-    def __init__(self, *args, use_custom_prompt: bool = True, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self._use_custom_prompt = use_custom_prompt
+def ensure_image_url(image: str) -> str:
+    prefixes = ['http://', 'https://', 'file://', 'data:image;']
+    if any(image.startswith(prefix) for prefix in prefixes):
+        return image
+    if os.path.exists(image):
+        return 'file://' + image
+    raise ValueError(f'Invalid image: {image}')
 
-    def set_dump_image(self, dump_image_func):
-        self.dump_image_func = dump_image_func
 
-    def dump_image(self, line, dataset):
-        return self.dump_image_func(line)
+def ensure_video_url(video: str) -> str:
+    prefixes = ['http://', 'https://', 'file://', 'data:video;']
+    if any(video.startswith(prefix) for prefix in prefixes):
+        return video
+    if os.path.exists(video):
+        return 'file://' + video
+    raise ValueError(f'Invalid video: {video}')
 
-    def use_custom_prompt(self, dataset: str) -> bool:
-        from vlmeval.dataset import DATASET_TYPE
-        dataset_type = DATASET_TYPE(dataset, default=None)
 
-        if not self._use_custom_prompt:
-            return False
-        if dataset in {'MMMU_DEV_VAL', 'MMMU_TEST'}:
-            return True
-        if dataset_type == 'MCQ':
-            return True
-        if dataset_type == 'Y/N' and dataset in {'HallusionBench', 'POPE'}:  # MME has it's own prompt
-            return True
-        if dataset_type == 'VQA' and dataset not in {'MMVet'}:  # MMVet VQA has it's own prompt
-            return True
-        return False
+def split_model():
+    device_map = {}
 
-    def build_prompt(self, line, dataset: str) -> list[dict[str, str]]:
-        from vlmeval.dataset import DATASET_TYPE
+    total_gpus = torch.cuda.device_count()
+    rank, world_size = get_rank_and_world_size()
+    num_gpus = total_gpus // world_size
+    # + 8 is virtual layers for the memory of visual
+    num_layers = 80 + 8
+    num_layers_per_gpu = math.ceil(num_layers / num_gpus)
+    num_layers_per_gpu = [num_layers_per_gpu] * num_gpus
+    num_layers_per_gpu[0] -= 6
+    num_layers_per_gpu[-1] -= 2
+    layer_cnt = 0
 
-        if dataset in {'MMMU_DEV_VAL', 'MMMU_TEST'}:
-            return self._build_mmmu_prompt(line, dataset)
-        dataset_type = DATASET_TYPE(dataset, default=None)
-        if dataset_type == 'MCQ':
-            return self._build_mcq_prompt(line, dataset)
-        if dataset_type == 'Y/N':
-            return self._build_yorn_prompt(line, dataset)
-        if dataset_type == 'VQA':
-            return self._build_vqa_prompt(line, dataset)
-        raise ValueError(f'Unsupported dataset: {dataset}')
+    for i, num_layer in enumerate(num_layers_per_gpu):
+        for j in range(num_layer):
+            device_map[f'model.layers.{layer_cnt}'] = rank + i * world_size
+            layer_cnt += 1
 
-    def _build_mmmu_prompt(self, line, dataset: str) -> list[dict[str, str]]:
-        """change the prompt for MMMU dataset: keep all images at beginning."""
+    last_gpu = rank + (num_gpus - 1) * world_size
+    device_map['visual'] = rank
+    device_map['model.embed_tokens'] = rank
+    device_map['model.norm'] = last_gpu
+    device_map['model.rotary_emb'] = last_gpu
+    device_map['lm_head'] = last_gpu
+    return device_map
 
-        import string
 
-        import pandas as pd
+class Qwen2VLChat(Qwen2VLPromptMixin, BaseModel):
+    INSTALL_REQ = False
+    INTERLEAVE = True
+    VIDEO_LLM = True
 
-        tgt_path = self.dump_image(line, dataset)
-        question = line['question']
-        options = {cand: line[cand] for cand in string.ascii_uppercase if cand in line and not pd.isna(line[cand])}
-        options_prompt = 'Options:\n'
-        for key, item in options.items():
-            options_prompt += f'{key}. {item}\n'
-        hint = line['hint'] if ('hint' in line and not pd.isna(line['hint'])) else None
-        prompt = ''
-        if hint is not None:
-            prompt += f'Hint: {hint}\n'
-        prompt += f'Question: {question}\n'
-        if len(options):
-            prompt += options_prompt
-            prompt += 'Please select the correct answer from the options above. \n'
-        prompt = prompt.rstrip()
-        msgs = []
-        if isinstance(tgt_path, list):
-            msgs.extend([dict(type='image', value=p) for p in tgt_path])
+    def __init__(
+        self,
+        model_path: str,
+        min_pixels: int | None = None,
+        max_pixels: int | None = None,
+        max_new_tokens=2048,
+        top_p=0.001,
+        top_k=1,
+        temperature=0.01,
+        repetition_penalty=1.0,
+        use_custom_prompt: bool = True,
+        system_prompt: str | None = None,
+        verbose: bool = False,
+        abs_coord: bool = False,
+    ):
+        super().__init__(use_custom_prompt=use_custom_prompt)
+        self.min_pixels = min_pixels
+        self.max_pixels = max_pixels
+        self.generate_kwargs = dict(
+            max_new_tokens=max_new_tokens,
+            top_p=top_p,
+            top_k=top_k,
+            temperature=temperature,
+            repetition_penalty=repetition_penalty,
+        )
+        self.system_prompt = system_prompt
+        self.verbose = verbose
+        self.fps = 2.0
+        self.nframe = 64
+        self.abs_coord = abs_coord
+
+        rank, world_size = get_rank_and_world_size()
+
+        assert model_path is not None
+        self.model_path = model_path
+
+        MODEL_CLS = None  
+        from transformers import Qwen2VLForConditionalGeneration, Qwen2VLProcessor
+        MODEL_CLS = Qwen2VLForConditionalGeneration 
+        default_path = model_path
+        self.processor = Qwen2VLProcessor.from_pretrained(default_path)
+
+        gpu_mems = get_gpu_memory()
+        max_gpu_mem = max(gpu_mems) if gpu_mems != [] else -1
+        assert max_gpu_mem > 0
+
+        # If only one process and GPU memory is less than 40GB
+        if auto_split_flag():
+            assert world_size == 1, 'Only support world_size == 1 when AUTO_SPLIT is set for non-72B Qwen2-VL'
+            # Will Use All GPUs to run one model
+            self.model = MODEL_CLS.from_pretrained(
+                model_path, torch_dtype='auto', device_map='auto', attn_implementation='flash_attention_2'
+            )
+        elif '72b' not in self.model_path.lower():
+            self.model = MODEL_CLS.from_pretrained(
+                model_path, torch_dtype='auto', device_map='cpu', attn_implementation='flash_attention_2'
+            )
+            self.model.cuda().eval()
         else:
-            msgs = [dict(type='image', value=tgt_path)]
-        msgs.append(dict(type='text', value=prompt))
-        return msgs
+            self.model = MODEL_CLS.from_pretrained(
+                model_path, torch_dtype='auto', device_map=split_model(), attn_implementation='flash_attention_2'
+            )
+            self.model.eval()
 
-    def _build_mcq_prompt(self, line, dataset: str) -> list[dict[str, str]]:
-        """change the prompt for MCQ dataset: use chinese prompt if the question contains chinese characters."""
-        MCQ_CN_PROMPT = '请直接回答选项字母。'
-        MCQ_EN_PROMPT = 'Please select the correct answer from the options above.'
+        torch.cuda.empty_cache()
 
-        import string
+    def _prepare_content(self, inputs: list[dict[str, str]], dataset: str | None = None) -> list[dict[str, str]]:
+        """
+        inputs list[dict[str, str]], each dict has keys: ['type', 'value']
+        """
+        content = []
+        for s in inputs:
+            if s['type'] == 'image':
+                item = {'type': 'image', 'image': ensure_image_url(s['value'])}
+                if dataset == 'OCRBench':
+                    item['min_pixels'] = 10 * 10 * 28 * 28
+                    warnings.warn(f"OCRBench dataset uses custom min_pixels={item['min_pixels']}")
+                    if self.max_pixels is not None:
+                        item['max_pixels'] = self.max_pixels
+                else:
+                    if self.min_pixels is not None:
+                        item['min_pixels'] = self.min_pixels
+                    if self.max_pixels is not None:
+                        item['max_pixels'] = self.max_pixels
+            elif s['type'] == 'video':
+                item = {'type': 'video', 'video': ensure_video_url(s['value'])}
+                if self.fps is not None:
+                    item['fps'] = self.fps
+                elif self.nframe is not None:
+                    item['nframes'] = self.nframe
+            elif s['type'] == 'text':
+                item = {'type': 'text', 'text': s['value']}
+            else:
+                raise ValueError(f"Invalid message type: {s['type']}, {s}")
+            content.append(item)
+        return content
 
-        import pandas as pd
+    def extract_bboxs(self, bboxes_str, pattern1, pattern2=None):
+        bboxes = []
+        try:
+            for pattern in [pattern1, pattern2]:
+                if pattern:
+                    bboxes_tmp = re.findall(pattern, bboxes_str.replace('\n', '').replace(' ', ''))
+                    if bboxes_tmp:
+                        for bbox in bboxes_tmp:  
+                            bbox = [point_str.strip() for point_str in bbox] 
+                            bboxes.append(list(map(float, bbox)))
+                        break
 
-        def cn_string(s):
-            import re
+        except:
+            print(f"Extract Error: {bboxes_str}")
+        return bboxes
+    
+    def extract_point(self, point_str, pattern):
+        try:
+            if '<point>' in point_str:
+                point = re.findall(pattern, point_str)
+                point = [int(value) for value in point[0]]
+            else:
+                point = []
+        except Exception as e:
+            print(f"extract_point Error: {point_str}, traceback: {e}")
+            point = []
 
-            if re.search('[\u4e00-\u9fff]', s):
-                return True
-            return False
+        return point
+    
+    def change_line_format(self, input, pattern1, pattern2, new_format):
+        for pattern in [pattern1, pattern2]:
+            bboxes = re.findall(pattern, input)
+            if bboxes:
+                if type(bboxes[0]) is str:
+                    bbox_str = bboxes[0]
+                else:
+                    bbox_str = ','.join(bboxes[0])
+                new_str = new_format.format(bbox_str=bbox_str)
+                input = re.sub(pattern, new_str, input)
+        return input
+    
+    def transfer_coord(self, input_str, input_height, input_width, reverse=False):
+        BBOX_PATTERN = re.compile(r'<\|box_start\|>\((.*?),(.*?)\),\((.*?),(.*?)\)<\|box_end\|>')
+        POINT_PATTERN = re.compile(r'<point>\((.*?),(.*?)\)')
+        ACTION_PATTERN = re.compile(r'\(\D*(\d+).*,\D*(\d+).*\)')
+        # REPL_PATTERN = re.compile(r'<\|box_start\|>(.*?)<\|box_end\|>')
+        bboxes = self.extract_bboxs(input_str, BBOX_PATTERN)
+        point = self.extract_point(input_str, POINT_PATTERN)
+        action = re.findall(ACTION_PATTERN, input_str)
 
-        tgt_path = self.dump_image(line, dataset)
-        question = line['question']
-        options = {cand: line[cand] for cand in string.ascii_uppercase if cand in line and not pd.isna(line[cand])}
-        options_prompt = 'Options:\n'
-        for key, item in options.items():
-            options_prompt += f'{key}. {item}\n'
-        hint = line['hint'] if ('hint' in line and not pd.isna(line['hint'])) else None
-        prompt = ''
-        if hint is not None:
-            prompt += f'Hint: {hint}\n'
-        prompt += f'Question: {question}\n'
-        if len(options):
-            prompt += options_prompt
-            prompt += MCQ_CN_PROMPT if cn_string(prompt) else MCQ_EN_PROMPT
-        prompt = prompt.rstrip()
-        msgs = []
-        if isinstance(tgt_path, list):
-            msgs.extend([dict(type='image', value=p) for p in tgt_path])
+        if bboxes:
+            bbox = bboxes[0]
+
+            if reverse:
+                abs_y1 = int(bbox[1]/input_height * 1000)
+                abs_x1 = int(bbox[0]/input_width * 1000)
+                abs_y2 = int(bbox[3]/input_height * 1000)
+                abs_x2 = int(bbox[2]/input_width * 1000)
+                bbox_str = f'({abs_x1},{abs_y1}),({abs_x2},{abs_y2})'
+                if max(abs_y1, abs_x1, abs_y2, abs_x2) > 1000:
+                    print('transfer_coord_error')
+                    print(f"{bbox} to {bbox_str}")
+            else:
+                abs_y1 = int(bbox[1]/1000 * input_height)
+                abs_x1 = int(bbox[0]/1000 * input_width)
+                abs_y2 = int(bbox[3]/1000 * input_height)
+                abs_x2 = int(bbox[2]/1000 * input_width)
+                bbox_str = f'<|box_start|>({abs_x1},{abs_y1}),({abs_x2},{abs_y2})<|box_end|>'
+            input_str = re.sub(BBOX_PATTERN, bbox_str, input_str)
+        
+        elif point:
+
+            if reverse:
+                abs_y1 = int(point[1]/input_height * 1000)
+                abs_x1 = int(point[0]/input_width * 1000)
+                point_str = f'<point>({abs_x1},{abs_y1})'
+                if max(abs_y1, abs_x1) > 1000:
+                    print('transfer_coord_error')
+                    print(f"{point} to {point_str}")
+            else:
+                abs_y1 = int(point[1]/1000 * input_height)
+                abs_x1 = int(point[0]/1000 * input_width)
+                point_str = f'<point>({abs_x1},{abs_y1})'
+            input_str = re.sub(POINT_PATTERN, point_str, input_str)
+        
+        elif action:
+
+            for p in action:
+                point = [float(i) for i in p]
+                # print(point)
+                if reverse:
+                    abs_y1 = int(point[1]/input_height * 1000)
+                    abs_x1 = int(point[0]/input_width * 1000)
+                    if max(abs_y1, abs_x1) > 1000:
+                        print('transfer_coord_error')
+                        print(f"{point} to {(abs_x1,abs_y1)}")
+                else:
+                    abs_y1 = int(point[1]/1000 * input_height)
+                    abs_x1 = int(point[0]/1000 * input_width)
+                input_str = input_str.replace(p[0], str(abs_x1)).replace(p[1], str(abs_y1))
         else:
-            msgs = [dict(type='image', value=tgt_path)]
-        msgs.append(dict(type='text', value=prompt))
-        return msgs
+            input_str = input_str
+        return input_str
+    
+    
+    def generate_inner(self, message, dataset=None):
+        try:
+            from .vision_process import process_vision_info
+        except Exception as err:
+            logging.critical("qwen_vl_utils not found, please install it via 'pip install qwen-vl-utils'")
+            raise err
 
-    def _build_yorn_prompt(self, line, dataset: str) -> list[dict[str, str]]:
-        """change the prompt for YORN dataset:"""
-        YORN_PROMPT = ' Please answer yes or no.'
+        messages = []
+        if self.system_prompt is not None:
+            messages.append({'role': 'system', 'content': self.system_prompt})
+        messages.append({'role': 'user', 'content': self._prepare_content(message, dataset=dataset)})
+        if self.verbose:
+            print(f'\033[31m{messages}\033[0m')
 
-        tgt_path = self.dump_image(line, dataset)
-        question = line['question']
-        msgs = []
-        if isinstance(tgt_path, list):
-            msgs.extend([dict(type='image', value=p) for p in tgt_path])
-        else:
-            msgs = [dict(type='image', value=tgt_path)]
-        msgs.append(dict(type='text', value=question))
-        assert msgs[-1]['type'] == 'text'
-        msgs[-1]['value'] += YORN_PROMPT
-        return msgs
+        if self.abs_coord:
+            text = self.processor.apply_chat_template([messages], tokenize=False, add_generation_prompt=True)
+            images, videos = process_vision_info([messages])
+            inputs = self.processor(text=text, images=images, videos=videos, padding=True, return_tensors='pt')
+            
+            input_height = inputs['image_grid_thw'][0][1]*14
+            input_width = inputs['image_grid_thw'][0][2]*14
+            for message in messages:
+                message['content'][1]['text'] = self.transfer_coord(message['content'][1]['text'], input_height, input_width)
 
-    def _build_vqa_prompt(self, line, dataset: str) -> list[dict[str, str]]:
-        """change the prompt for VQA dataset:"""
-        VQA_PROMPT = '\nPlease try to answer the question with short words or phrases if possible.'
+        text = self.processor.apply_chat_template([messages], tokenize=False, add_generation_prompt=True)
+        images, videos = process_vision_info([messages])
+        
+        inputs = self.processor(text=text, images=images, videos=videos, padding=True, return_tensors='pt')
+        inputs = inputs.to('cuda')
 
-        tgt_path = self.dump_image(line, dataset)
-        question = line['question']
-        msgs = []
-        if isinstance(tgt_path, list):
-            msgs.extend([dict(type='image', value=p) for p in tgt_path])
-        else:
-            msgs = [dict(type='image', value=tgt_path)]
-        msgs.append(dict(type='text', value=question))
-        assert msgs[-1]['type'] == 'text'
-        msgs[-1]['value'] += VQA_PROMPT
-        return msgs
+        generated_ids = self.model.generate(
+            **inputs,
+            **self.generate_kwargs,
+        )
+        generated_ids = [
+            output_ids[len(input_ids):] for input_ids, output_ids in zip(inputs.input_ids, generated_ids)
+        ]
+        out = self.processor.tokenizer.batch_decode(
+            generated_ids, skip_special_tokens=False, clean_up_tokenization_spaces=False
+        )
+        response = out[0].removesuffix('<|im_end|>')
+        if self.verbose:
+            print(f'\033[32m{response}\033[0m')
+
+        if self.abs_coord:
+            input_height = inputs['image_grid_thw'][0][1]*14
+            input_width = inputs['image_grid_thw'][0][2]*14
+            response = self.transfer_coord(response, input_height, input_width, reverse=True)
+
+        return response
