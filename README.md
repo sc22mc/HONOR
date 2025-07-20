@@ -54,78 +54,27 @@ Download [AgentCPM-GUI](https://huggingface.co/openbmb/AgentCPM-GUI) from Huggin
 
 ```python
 import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM
-from PIL import Image
-import json
+from utils.model import Qwen2VLChat
 
 # 1. Load the model and tokenizer
-model_path = "model/AgentCPM-GUI"  # model path
-tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
-model = AutoModelForCausalLM.from_pretrained(model_path, trust_remote_code=True, torch_dtype=torch.bfloat16)
+model_path = "model/MAGICGUI"  # model path
+model = Qwen2VLChat.from_pretrained(model_path, min_pixels=4*28*28, max_pixels=768*28*28)
 model = model.to("cuda:0") 
 
 # 2. Build the input
-instruction = "请点击屏幕上的‘会员’按钮"
-image_path = "assets/test.jpeg"
-image = Image.open(image_path).convert("RGB")
+instruction = "请找出屏幕截图中的选项区，要求距离坐标点<point>(167,84)最近。注意，仅定位最相关的控件即可，以<|box_start|>矩形框<|box_end|>格式输出。输出示例：<|box_start|>(70,58)(125,86)<|box_end|>"
+image_path = "./assets/test_img/grounding.png"
 
-# 3. Resize the longer side to 1120 px to save compute & memory
-def __resize__(origin_img):
-    resolution = origin_img.size
-    w,h = resolution
-    max_line_res = 1120
-    if max_line_res is not None:
-        max_line = max_line_res
-        if h > max_line:
-            w = int(w * max_line / h)
-            h = max_line
-        if w > max_line:
-            h = int(h * max_line / w)
-            w = max_line
-    img = origin_img.resize((w,h),resample=Image.Resampling.LANCZOS)
-    return img
-image = __resize__(image)
+# 3. Build the message format
+messages = [{"type": "image", "value":f"{image_path}",
+            {"type": "text", "value":f"{instruction}"]
 
-# 4. Build the message format
-messages = [{
-    "role": "user",
-    "content": [
-        f"<Question>{instruction}</Question>\n当前屏幕截图：",
-        image
-    ]
-}]
-
-# 5. Inference
-ACTION_SCHEMA = json.load(open('eval/utils/schema/schema.json', encoding="utf-8"))
-items = list(ACTION_SCHEMA.items())
-insert_index = 3
-items.insert(insert_index, ("required", ["thought"])) # enable/disable thought by setting it to "required"/"optional"
-ACTION_SCHEMA = dict(items)
-SYSTEM_PROMPT = f'''# Role
-你是一名熟悉安卓系统触屏GUI操作的智能体，将根据用户的问题，分析当前界面的GUI元素和布局，生成相应的操作。
-
-# Task
-针对用户问题，根据输入的当前屏幕截图，输出下一步的操作。
-
-# Rule
-- 以紧凑JSON格式输出
-- 输出操作必须遵循Schema约束
-
-# Schema
-{json.dumps(ACTION_SCHEMA, indent=None, ensure_ascii=False, separators=(',', ':'))}'''
-
-outputs = model.chat(
-    image=None,
-    msgs=messages,
-    system_prompt=SYSTEM_PROMPT,
-    tokenizer=tokenizer,
-    temperature=0.1,
-    top_p=0.3,
-    n=1,
+# 4. Inference
+response = model.generate(
+    message = messages,
 )
 
-# 6. Output
-print(outputs)
+print(response)
 ```
 
 Expected output:
