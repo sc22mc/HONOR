@@ -118,20 +118,110 @@ Source code for SFT and RFT training is provided — see [SFT](sft/readme.md) an
 
 ### Performance comparison on the Magic-RICH dataset
 
-| Model                | <th colspan="3">Routine</th> | <th colspan="3">Instruction</th> | <th colspan="3">Complex</th> | <th colspan="3">Handling</th> | Exception |
-|----------------------|------------------------------|----------------------------------|------------------------------|--------------------------------|-----------|
-|                      | Type | Grd | SR | Type | Grd | SR | Type | Grd | SR | Type | Grd | SR | – |
-| **GPT-4o**            | 49.3 | 16.7 | 4.6 | 56.6 | 13.5 | 19.8 | 49.0 | 14.6 | 7.4 | 85.1 | – | – | 70.8 |
-| **Gemini 2.0**        | 89.2 | 49.4 | 34.7 | 84.1 | 54.2 | 51.4 | 83.3 | 50.3 | 42.0 | 73.7 | – | – | 68.3 |
-| **InternVL-2-8B**     | 30.1 | 2.8  | 1.3 | 37.1 | 4.0  | 15.8 | 17.1 | 6.0  | 1.3 | 70.8 | – | – | 68.3 |
-| **Qwen2-VL-7B**       | 71.7 | 41.0 | 28.1 | 73.6 | 43.9 | 41.5 | 65.6 | 28.7 | 21.2 | 67.0 | – | – | 67.0 |
-| **Qwen2.5-VL-7B**     | 94.3 | 92.6 | 76.3 | 89.3 | 95.7 | 83.6 | 86.6 | 69.6 | 60.0 | 67.0 | – | – | 67.0 |
-| **UI-TARS-7B**        | 83.5 | 84.9 | 73.3 | 76.6 | 85.6 | 69.8 | 91.4 | 69.1 | 67.0 | 3.6  | – | – | 67.0 |
-| **UI-TARS-1.5-7B**    | 85.6 | 96.2 | 81.5 | 78.6 | 92.1 | 72.2 | 94.7 | 74.3 | 71.1 | 57.0 | – | – | 57.0 |
-| **MiMo-VL-7B-SFT**    | 93.0 | 77.9 | 65.3 | 89.7 | 85.7 | 75.4 | 89.1 | 80.1 | 71.0 | 67.0 | – | – | 67.0 |
-| **AgentCPM-GUI**      | 84.3 | 92.2 | 75.1 | 70.4 | 80.7 | 56.0 | 72.3 | 54.6 | 39.4 | 74.1 | – | – | 74.1 |
-| **MagicGUI-CPT**      | 98.5 | 98.5 | 97.2 | 95.5 | 96.3 | 92.9 | 88.5 | 82.3 | 72.9 | 93.2 | – | – | 93.2 |
-| **MagicGUI-RFT**      | 99.7 | 97.5 | 97.5 | 97.2 | 95.6 | 94.0 | 92.1 | 80.4 | 74.1 | 92.1 | – | – | 92.1 |
+<table>
+  <thead>
+    <tr>
+      <th rowspan="2">Agent Models</th>
+      <th colspan="3">Routine</th>
+      <th colspan="3">Instruction</th>
+      <th colspan="3">Complex</th>
+      <th rowspan="2">Handing Exception</th>
+    </tr>
+    <tr>
+      <th>Type</th><th>Grd</th><th>SR</th>
+      <th>Type</th><th>Grd</th><th>SR</th>
+      <th>Type</th><th>Grd</th><th>SR</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Closed-source Models -->
+    <tr><td colspan="11"><em>Closed-source Models</em></td></tr>
+    <tr>
+      <td>GPT-4o (Hurst et al., 2024)</td>
+      <td>49.3</td><td>16.7</td><td>4.6</td>
+      <td>56.6</td><td>13.5</td><td>19.8</td>
+      <td>49.0</td><td>14.6</td><td>7.4</td>
+      <td>85.1</td>
+    </tr>
+    <tr>
+      <td>Gemini 2.0 (Pichai et al., 2024)</td>
+      <td>89.2</td><td>49.4</td><td>34.7</td>
+      <td>84.1</td><td>54.2</td><td>51.4</td>
+      <td>83.3</td><td>50.3</td><td>42.0</td>
+      <td>73.7</td>
+    </tr>
+
+    <!-- Open-source Models -->
+    <tr><td colspan="11"><em>Open-source Models</em></td></tr>
+    <tr>
+      <td>InternVL-2-8B (Chen et al., 2024c)</td>
+      <td>30.1</td><td>2.8</td><td>1.3</td>
+      <td>37.1</td><td>4.0</td><td>15.8</td>
+      <td>17.1</td><td>6.0</td><td>1.3</td>
+      <td>70.8</td>
+    </tr>
+    <tr>
+      <td>Qwen2-VL-7B (Wang et al., 2024c)</td>
+      <td>71.7</td><td>41.0</td><td>28.1</td>
+      <td>73.6</td><td>43.9</td><td>41.5</td>
+      <td>65.6</td><td>28.7</td><td>21.2</td>
+      <td>68.3</td>
+    </tr>
+    <tr>
+      <td>Qwen2.5-VL-7B (Bai et al., 2025)</td>
+      <td>94.3</td><td>92.6</td><td>76.3</td>
+      <td>89.3</td><td><u>95.7</u></td><td>83.6</td>
+      <td>86.6</td><td>69.6</td><td>60.0</td>
+      <td>67.0</td>
+    </tr>
+    <tr>
+      <td>UI-TARS-7B (Qin et al., 2025)</td>
+      <td>83.5</td><td>84.9</td><td>73.3</td>
+      <td>76.6</td><td>85.6</td><td>69.8</td>
+      <td>91.4</td><td>69.1</td><td>67.0</td>
+      <td>3.6</td>
+    </tr>
+    <tr>
+      <td>UI-TARS-1.5-7B (Seed, 2025)</td>
+      <td>85.6</td><td>96.2</td><td>81.5</td>
+      <td>78.6</td><td>92.1</td><td>72.2</td>
+      <td><b>94.7</b></td><td>74.3</td><td>71.1</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>MiMo-VL-7B-SFT (Xiaomi, 2025)</td>
+      <td>93.0</td><td>77.9</td><td>65.3</td>
+      <td>89.7</td><td>85.7</td><td>75.4</td>
+      <td>89.1</td><td>80.1</td><td>71.0</td>
+      <td>57.0</td>
+    </tr>
+    <tr>
+      <td>AgentCPM-GUI (Zhang et al., 2025b)</td>
+      <td>84.3</td><td>92.2</td><td>75.1</td>
+      <td>70.4</td><td>80.7</td><td>56.0</td>
+      <td>72.3</td><td>54.6</td><td>39.4</td>
+      <td>2.4</td>
+    </tr>
+
+    <!-- MagicGUI -->
+    <tr style="background-color:#e8eafc;">
+      <td>MagicGUI-CPT</td>
+      <td><b>98.5</b></td><td><b>98.5</b></td><td><b>97.2</b></td>
+      <td><b>95.5</b></td><td><b>96.3</b></td><td><b>92.9</b></td>
+      <td>88.5</td><td><b>82.3</b></td><td><b>72.9</b></td>
+      <td><b>93.2</b></td>
+    </tr>
+    <tr style="background-color:#e8eafc;">
+      <td>MagicGUI-RFT</td>
+      <td><b>99.7</b></td><td>97.5</td><td><b>97.5</b></td>
+      <td><b>97.2</b></td><td>95.6</td><td><b>94.0</b></td>
+      <td>92.1</td><td>80.4</td><td><b>74.1</b></td>
+      <td>92.1</td>
+    </tr>
+  </tbody>
+</table>
+
+
 
 
 
