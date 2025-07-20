@@ -136,6 +136,7 @@ Source code for SFT and RFT training is provided — see [SFT](sft/readme.md) an
 
 
 
+
 ### Performance comparison on open-source AndroidControl and GUI-Odyssey datasets. 
 
 | Model                  | AC-Low | AC-High | GUI-Odyssey |
