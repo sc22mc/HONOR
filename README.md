@@ -80,7 +80,7 @@ print(response)
 Expected output:
 
 ```JSON
-<|box_start|>(48.92)(853,137)<|box_end|>
+{"<|box_start|>(48.92)(853,137)<|box_end|>"}
 ```
 
 Note: AgentCPM-GUI outputs relative coordinates ranging from 0-1000. The conversions are as follows:
