@@ -80,7 +80,7 @@ print(response)
 Expected output:
 
 ```JSON
-{"thought":"任务目标是点击屏幕上的‘会员’按钮。当前界面显示了应用的推荐页面，顶部有一个导航栏。点击‘会员’按钮可以访问应用的会员相关内容。","POINT":[729,69]}
+<|box_start|>(48.92)(853,137)<|box_end|>
 ```
 
 Note: AgentCPM-GUI outputs relative coordinates ranging from 0-1000. The conversions are as follows:
