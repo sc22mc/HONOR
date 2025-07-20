@@ -91,15 +91,23 @@ At each step, the agent outputs is a single JSON object that contains:
 
 Note that all keywords are **case-sensitive**, and we use **compact JSON** (i.e., no extra whitespace), which affects the tokenizer’s behavior.
 
-| Action         | Required field(s)                                                                                           | Optional field(s)             | Purpose                                                                     |  Example                                  |
-| --------------------- | ----------------------------------------------------------------------------------------------------------- | ----------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------ |
-| **Click**               | `POINT:[x,y]`                                                                                               | `duration`,`thought`,`STATUS` | Single tap at the normalized screen coordinate (0–1000, origin = top-left). | `{"POINT":[480,320]}`                            |
-| **Long Press**               | `POINT:[x,y]`<br>`duration:1000`                                                                                               | `duration`,`thought`,`STATUS` | Touch-and-hold at coordinate (set a longer duration, e.g. >200 ms). | `{"POINT":[480,320],"duration":1000}`                            |
-| **Swipe**      | `POINT:[x,y]`<br>`to:"up" \| "down" \| "left" \| "right"` **or** `to:[x,y]`                                 | `duration`,`thought`,`STATUS` | Swipe from the start point toward a direction **or** another coordinate.     | `{"POINT":[500,200],"to":"down"}` |
-| **Press key**         | `PRESS:"HOME" \| "BACK" \| "ENTER"`                                                                         | `duration`,`thought`,`STATUS` | Trigger a hardware / navigation button.                                     | `{"PRESS":"HOME"}`                |
-| **Type text**         | `TYPE:"<text>"`                                                                    | `duration`,`thought`,`STATUS` | Insert the given text at the current input focus.                           | `{"TYPE":"Hello, world!"}`                       |
-| **Wait**              | `duration`                                                                              | `thought`,`STATUS`            | Idle for the specified time without any other action.                       | `{"duration":500}`                               |
-| **Task-level status** | `STATUS:"start" \| "continue" \| "finish" \| "satisfied" \| "impossible" \| "interrupt" \| "need_feedback"` | `duration`,`thought`          | Report task progress; may appear **alone** or **with a primitive action**.  | `{"STATUS":"finish"}`                        |
+| Action             | Description                                                             | Conditions for R<sub>acc</sub> = +2                                                                              |
+|--------------------|-------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|
+| **Tap**            | Click at coordinate (x, y)                                               | dist([x, y], [x<sub>c</sub>, y<sub>c</sub>]) ≤ 14%                                                               |
+| **Scroll**         | Scroll at coordinate (x, y) with direction up / down / left / right     | dist([x, y], [x<sub>c</sub>, y<sub>c</sub>]) ≤ 14% and direction = gt[direction]                                |
+| **Text Input**     | Type *text* at coordinate (x, y)                                         | dist([x, y], [x<sub>c</sub>, y<sub>c</sub>]) ≤ 14% and F1(text, gt[text]) > 0.5                                 |
+| **Navigation Back**| Adb command to go back to the previous page                             | –                                                                                                                |
+| **Navigation Home**| Adb command to go to the home screen of the mobile                      | –                                                                                                                |
+| **Long Press**     | Long Press at coordinate (x, y)                                          | dist([x, y], [x<sub>c</sub>, y<sub>c</sub>]) ≤ 14%                                                               |
+| **Finish**         | Indicate that navigate task has been completed                          | –                                                                                                                |
+| **Wait**           | wait for several seconds                                                 | –                                                                                                                |
+| **Enter**          | Adb command to press enter                                               | –                                                                                                                |
+| **Takeover**       | Request user takeover                                                    | –                                                                                                                |
+| **Drag**           | Drag from coordinate (x₁, y₁) to coordinate (x₂, y₂)                    | dist([x₁, y₁], [x<sub>1c</sub>, y<sub>1c</sub>]) ≤ 7.5% and dist([x₂, y₂], [x<sub>2c</sub>, y<sub>2c</sub>]) ≤ 7.5% |
+| **Call API**       | Adb command to *open/kill* app                                           | app = gt[app] and open/kill = gt[operation]                                                                      |
+| **Screenshot**     | Adb command to screenshot                                                | –                                                                                                                |
+| **Long Screenshot**| Adb command to long screenshot                                           | –                                                                                                                |
+
 
 
 ## Fine-tuning
