@@ -262,7 +262,6 @@ Source code for SFT and RFT training is provided — see [SFT](sft/readme.md) an
       <td>-</td><td>12.5</td>
       <td>60.9</td><td>-</td>
     </tr>
-
     <!-- Open-source Models -->
     <tr><td colspan="7"><em>Open-source Models</em></td></tr>
     <tr>
