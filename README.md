@@ -150,7 +150,6 @@ Source code for SFT and RFT training is provided — see [SFT](sft/readme.md) an
       <td>83.3</td><td>50.3</td><td>42.0</td>
       <td>73.7</td>
     </tr>
-
     <!-- Open-source Models -->
     <tr><td colspan="11"><em>Open-source Models</em></td></tr>
     <tr>
@@ -202,7 +201,6 @@ Source code for SFT and RFT training is provided — see [SFT](sft/readme.md) an
       <td>72.3</td><td>54.6</td><td>39.4</td>
       <td>2.4</td>
     </tr>
-
     <!-- MagicGUI -->
     <tr style="background-color:#e8eafc;">
       <td>MagicGUI-CPT</td>
