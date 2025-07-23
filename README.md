@@ -14,7 +14,7 @@
   <a href="https://arxiv.org/abs/2506.01391">Technical Report</a>
 </p>
 
-## News
+## News（链接需要修改）
 
 * [2025-07-20] 📄📄📄 We have released the **technical report** of AgentCPM-GUI! Check it out [here](https://arxiv.org/abs/2506.01391).
 * [2025-07-20] 🚀🚀🚀 We have open-sourced **MAGICGUI**, an on-device GUI agent capable of operating Chinese & English apps and equipped with RFT-enhanced reasoning abilities.
@@ -35,7 +35,7 @@ Two-Stage Training Paradigm: Strengthen core perception, localization, and navig
 
 ## Quick Start
 
-### Install dependencies
+### Install dependencies（需要修改）
 
 ```bash
 git clone https://github.com/OpenBMB/AgentCPM-GUI
