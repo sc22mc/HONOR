@@ -111,7 +111,7 @@ Note that all keywords are **case-sensitive**, and we use **compact JSON** (i.e.
 
 ## Evaluate
 ### 1.Data Download
-Please download the dataset from the [official dataset link](https://example.com/dataset-download) and palce the folders into the .datasets/ directory.
+Please download the dataset from the subset from the [Magic-RICH dataset](https://example.com/dataset-download) and palce the folders into the .datasets/ directory.
 
 - `assets/`: 
 - `datasets/`: 
@@ -121,11 +121,11 @@ Please download the dataset from the [official dataset link](https://example.com
 - `utils/`:
 ### 2. Evaluate
 We use run_eval.py for evaluation.
-
+param:
 `--data`: Name of a subset from the [Magic-RICH dataset](https://example.com/dataset-download)  
 `--model`: Path to the model  
 `--work-dir (str, default to '.')`: Directory to save evaluation results  
-`--mode (str, default: 'all', choices: ['all', 'infer'])`:  If set to "all", both inference and evaluation will be performed;  if set to "infer", only inference will be executed  
+`--mode (str, default: 'all', choices: ['all', 'infer'])`: If set to "all", the script performs both inference and evaluation; if set to "infer", it performs inference only.
 
 
 ## Performance Evaluation
