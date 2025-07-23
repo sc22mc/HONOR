@@ -227,19 +227,97 @@ Source code for SFT and RFT training is provided — see [SFT](sft/readme.md) an
 
 ### Performance comparison on open-source AndroidControl and GUI-Odyssey datasets. 
 
-| Model                  | AC-Low | AC-High | GUI-Odyssey |
-|------------------------|--------|---------|-------------|
-| **GPT-4o**              | -      | 19.5    | -           |
-| **Gemini 2.0**          | -      | 28.5    | -           |
-| **Claude 2.0**          | -      | 28.5    | -           |
-| **Qwen2-VL-7B**         | 55.7   | 45.8    | 58.6        |
-| **Qwen2.5-VL-7B**       | 94.1   | 75.1    | 59.5        |
-| **Aguvis-7B**           | 93.9   | 65.6    | 26.7        |
-| **OS-Atlas-7B**         | 73.0   | 70.4    | 91.8*       |
-| **UI-TARS-7B**          | 95.2   | 81.6    | 86.1        |
-| **AgentCPM-GUI**        | 94.4   | 77.7    | 90.9        |
-| **MagicGUI-CPT**        | 97.2   | 94.5    | 90.4        |
-| **MagicGUI-RFT**        | 99.7   | 93.5    | 89.7        |
+<table>
+  <thead>
+    <tr>
+      <th rowspan="2">Agent Models</th>
+      <th colspan="2">AC-Low</th>
+      <th colspan="2">AC-High</th>
+      <th colspan="2">GUI-Odyssey</th>
+    </tr>
+    <tr>
+      <th>Type</th><th>SR</th>
+      <th>Type</th><th>SR</th>
+      <th>Type</th><th>SR</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Closed-source Models -->
+    <tr><td colspan="7"><em>Closed-source Models</em></td></tr>
+    <tr>
+      <td>GPT-4o (Hurst et al., 2024)</td>
+      <td>-</td><td>19.5</td>
+      <td>-</td><td>20.8</td>
+      <td>-</td><td>20.4</td>
+    </tr>
+    <tr>
+      <td>Gemini 2.0 (Pichai et al., 2024)</td>
+      <td>-</td><td>28.5</td>
+      <td>-</td><td>60.2</td>
+      <td>-</td><td>3.3</td>
+    </tr>
+    <tr>
+      <td>Claude 2.0 (Anthropic, 2024)</td>
+      <td>-</td><td>28.5</td>
+      <td>-</td><td>12.5</td>
+      <td>60.9</td><td>-</td>
+    </tr>
+
+    <!-- Open-source Models -->
+    <tr><td colspan="7"><em>Open-source Models</em></td></tr>
+    <tr>
+      <td>Qwen2-VL-7B (Wang et al., 2024c)</td>
+      <td>55.7</td><td>36.2</td>
+      <td>45.8</td><td>21.2</td>
+      <td>58.6</td><td>13.3</td>
+    </tr>
+    <tr>
+      <td>Qwen2.5-VL-7B (Bai et al., 2025)</td>
+      <td>94.1</td><td>85.0</td>
+      <td>75.1</td><td>62.9</td>
+      <td>59.5</td><td>46.3</td>
+    </tr>
+    <tr>
+      <td>Aguvis-7B (Xu et al., 2024)</td>
+      <td>93.9</td><td>89.4</td>
+      <td>65.6</td><td>54.2</td>
+      <td>26.7</td><td>13.5</td>
+    </tr>
+    <tr>
+      <td>OS-Atlas-7B (Wu et al., 2024c)</td>
+      <td>73.0</td><td>67.3</td>
+      <td>70.4</td><td>56.5</td>
+      <td>91.8*</td><td>76.8*</td>
+    </tr>
+    <tr>
+      <td>UI-TARS-7B (Qin et al., 2025)</td>
+      <td>95.2</td><td>91.8</td>
+      <td>81.6</td><td>74.4</td>
+      <td>86.1</td><td>67.9</td>
+    </tr>
+    <tr>
+      <td>AgentCPM-GUI (Zhang et al., 2025b)</td>
+      <td>94.4</td><td>90.2</td>
+      <td>77.7</td><td>69.2</td>
+      <td><b>90.9</b></td><td><b>75.0</b></td>
+    </tr>
+
+    <!-- MagicGUI -->
+    <tr style="background-color:#e8eafc;">
+      <td>MagicGUI-CPT</td>
+      <td>94.5</td><td>86.7</td>
+      <td>84.6</td><td>73.1</td>
+      <td><b>90.4</b></td><td>73.5</td>
+    </tr>
+    <tr style="background-color:#e8eafc;">
+      <td>MagicGUI-RFT</td>
+      <td><b>97.2</b></td><td><b>93.5</b></td>
+      <td><b>84.7</b></td><td><b>76.3</b></td>
+      <td>89.7</td><td><b>74.3</b></td>
+    </tr>
+  </tbody>
+</table>
+
 
 
 > \*Different train/test splits
