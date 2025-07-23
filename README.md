@@ -107,7 +107,10 @@ Note that all keywords are **case-sensitive**, and we use **compact JSON** (i.e.
 | **Screenshot**     | Adb command to screenshot                                                | –                                                                                                                |
 | **Long Screenshot**| Adb command to long screenshot                                           | –                                                                                                                |
 
+## Evaluation Data
 
+We provide **Magic-RICH dataset**, an evaluation benchmark for Chinese apps covering**step**, **grounding** and **action** tasks.
+See the dataset on [Hugging Face](https://example.com/dataset-download).
 
 ## Evaluate
 ### 1.Data Download
@@ -119,14 +122,18 @@ Please download the dataset from the subset from the [Magic-RICH dataset](https:
   - `one_grounding/`：
   - `.../`：
 - `utils/`:
-### 2. Evaluate
+### 2. Param
 We use run_eval.py for evaluation.
-param:
-`--data`: Name of a subset from the [Magic-RICH dataset](https://example.com/dataset-download)  
-`--model`: Path to the model  
-`--work-dir (str, default to '.')`: Directory to save evaluation results  
-`--mode (str, default: 'all', choices: ['all', 'infer'])`: If set to "all", the script performs both inference and evaluation; if set to "infer", it performs inference only.
 
+- `--data`: Name of a subset from the [Magic-RICH dataset](https://example.com/dataset-download)  
+- `--model`: Path to the model  
+- `--work-dir (str, default to '.')`: Directory to save evaluation results  
+- `--mode (str, default: 'all', choices: ['all', 'infer'])`: If set to "all", the script performs both inference and evaluation; if set to "infer", it performs inference only.
+
+### 3. Run
+```python
+python run_eval.py --data one_grounding --model your_model_path --mode all
+```
 
 ## Performance Evaluation
 
@@ -335,11 +342,6 @@ param:
 > \*Different train/test splits
 
 TM and EM stand for the **Type Match** and **Exact Match**, respectively. All evaluation data and code are open-sourced — see [here](eval) for details.
-
-## Evaluation Data
-
-We provide **CAGUI**, an evaluation benchmark for Chinese apps covering **grounding** and **agent** tasks.
-See the dataset on [Hugging Face](https://huggingface.co/datasets/openbmb/CAGUI).
 
 ## FAQs
 
