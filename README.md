@@ -109,9 +109,9 @@ Note that all keywords are **case-sensitive**, and we use **compact JSON** (i.e.
 
 
 
-## Fine-tuning
+## Evaluate
 
-Source code for SFT and RFT training is provided — see [SFT](sft/readme.md) and [RFT](rft/readme.md).
+
 
 ## Performance Evaluation
 
@@ -299,7 +299,6 @@ Source code for SFT and RFT training is provided — see [SFT](sft/readme.md) an
       <td>77.7</td><td>69.2</td>
       <td><b>90.9</b></td><td><b>75.0</b></td>
     </tr>
-
     <!-- MagicGUI -->
     <tr style="background-color:#e8eafc;">
       <td>MagicGUI-CPT</td>
