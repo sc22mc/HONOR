@@ -110,16 +110,26 @@ Note that all keywords are **case-sensitive**, and we use **compact JSON** (i.e.
 
 
 ## Evaluate
-### 📥Data Download
-
+### 1.Data Download
 Please download the dataset from the [official dataset link](https://example.com/dataset-download) and palce the folders into the .datasets/ directory.
 
 - `assets/`: 
 - `datasets/`: 
   - `Agent_Data_QA_grounding/`：
   - `one_grounding/`：
-  - `....../`：
-- `utils/`: 
+  - `.../`：
+- `utils/`:
+### 2. Evaluate
+We use run_eval.py for evaluation.
+
+`--data`: Name of a subset from the [Magic-RICH dataset](https://example.com/dataset-download)  
+`--model`: Path to the model  
+`--work-dir (str, default to '.')`: Directory to save evaluation results  
+`--mode (str, default: 'all', choices: ['all', 'infer'])`:  
+    If set to "all", both inference and evaluation will be performed;  
+    if set to "infer", only inference will be executed  
+
+
 ## Performance Evaluation
 
 ### Performance comparison on the Magic-RICH dataset
