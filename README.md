@@ -47,7 +47,7 @@ pip install -r requirements.txt
 
 ### Download the model
 
-Download [AgentCPM-GUI](https://huggingface.co/openbmb/AgentCPM-GUI) from Hugging Face and place it in `model/AgentCPM-GUI`.
+Download [MagicGUI](https://huggingface.co/openbmb/AgentCPM-GUI) .
 
 #### Huggingface Inference
 
