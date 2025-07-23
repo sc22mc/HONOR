@@ -111,14 +111,15 @@ Note that all keywords are **case-sensitive**, and we use **compact JSON** (i.e.
 
 ## Evaluate
 ### 📥Data Download
+
+Please download the dataset from the [official dataset link](https://example.com/dataset-download) and palce the folders into the .datasets/ directory.
+
 - `assets/`: 
 - `datasets/`: 
   - `Agent_Data_QA_grounding/`：
   - `one_grounding/`：
+  - `....../`：
 - `utils/`: 
-
-请从 [官方数据集链接](https://example.com/dataset-download) 下载数据集，将解压后的文件夹放在 `./data/` 目录下。
-
 ## Performance Evaluation
 
 ### Performance comparison on the Magic-RICH dataset
