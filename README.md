@@ -21,18 +21,17 @@
 
 ## Overview
 
-**AgentCPM-GUI** is an open-source on-device LLM agent model jointly developed by [THUNLP](https://nlp.csai.tsinghua.edu.cn), Renmin University of China and [ModelBest](https://modelbest.cn/en). Built on [MiniCPM-V](https://github.com/OpenBMB/MiniCPM-V) with 8 billion parameters, it accepts smartphone screenshots as input and autonomously executes user-specified tasks. 
+MagicGUI is an open-source GUI agent model developed by Honor, built on Qwen2-VL with 7 billion parameters. It demonstrates outstanding capabilities in visual grounding, screen question answering, and action sequence planning and execution. MagicGUI enables multimodal perception, understanding, and automated execution of user tasks on mobile devices.
 
-Key features include:
+Data Collection Framework: Propose a scalable and modular framework for GUI data collection that efficiently gathers high-quality data on mobile devices.
 
-- **High-quality GUI grounding** — Pre-training on a large-scale bilingual Android dataset significantly boosts localization and comprehension of common GUI widgets (buttons, input boxes, labels, icons, etc.).
-- **Chinese-app operation** — The first open-source GUI agent finely tuned for Chinese apps, covering 30 + popular titles such as Amap, Dianping, bilibili and Xiaohongshu.
-- **Enhanced planning & reasoning** — Reinforcement fine-tuning (RFT) lets the model “think” before outputting an action, greatly improving success on complex tasks.
-- **Compact action-space design** — An optimized action space and concise JSON format reduce the average action length to 9.7 tokens, boosting on-device inference efficiency.
+Powerful Perception and Grounding Capabilities: Enhance the perception and grounding abilities on mobile device screens by integrating large-scale knowledge through tasks such as element referring, element grounding, and screen captioning.
 
-Demo Case (1x speed):
+Unified Action Space: Develop a comprehensive and unified action space for various mobile platforms, encompassing fundamental operations like Tap, Text Input, and Scroll, while also supporting more complex actions such as Wait, Drag, and Takeover.
 
-https://github.com/user-attachments/assets/694d3c2c-12ce-4084-8feb-4937ca9ad247
+Planning-Oriented Reasoning: Implement a planning-oriented reasoning mechanism to improve the stability of task execution and enhance the accuracy of action decisions in dynamic environments.
+
+Two-Stage Training Paradigm: Strengthen core perception, localization, and navigation capabilities through Continued Pre-training (CPT), while enhancing model robustness and generalization via Reinforcement Fine-tuning (RFT).
 
 ## Quick Start
 
