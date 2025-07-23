@@ -125,9 +125,7 @@ We use run_eval.py for evaluation.
 `--data`: Name of a subset from the [Magic-RICH dataset](https://example.com/dataset-download)  
 `--model`: Path to the model  
 `--work-dir (str, default to '.')`: Directory to save evaluation results  
-`--mode (str, default: 'all', choices: ['all', 'infer'])`:  
-    If set to "all", both inference and evaluation will be performed;  
-    if set to "infer", only inference will be executed  
+`--mode (str, default: 'all', choices: ['all', 'infer'])`:  If set to "all", both inference and evaluation will be performed;  if set to "infer", only inference will be executed  
 
 
 ## Performance Evaluation
