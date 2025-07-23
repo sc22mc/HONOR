@@ -110,55 +110,55 @@ Note that all keywords are **case-sensitive**, and we use **compact JSON** (i.e.
       <td><b>Scroll</b></td>
       <td>Scroll at coordinate (x, y) with<br>direction up / down / left / right</td>
       <td>dist([x, y], [x<sub>c</sub>, y<sub>c</sub>]) ≤ 14%<br>and direction = gt[direction]</td>
-      <td></td>
+      <td><code>scroll(&lt;|box_start|&gt;(1,1)(2,2)&lt;|box_end|&gt;, "up")</code></td>
     </tr>
     <tr>
       <td><b>Text Input</b></td>
       <td>Type <i>text</i> at coordinate (x, y)</td>
       <td>dist([x, y], [x<sub>c</sub>, y<sub>c</sub>]) ≤ 14%<br>and F1(text, gt[text]) > 0.5</td>
-      <td></td>
+      <td><code>text(&lt;|box_start|&gt;(1,1)(2,2)&lt;|box_end|&gt;, "13 1205")</code></td>
     </tr>
     <tr>
       <td><b>Navigation Back</b></td>
       <td>Adb command to go back to the previous page</td>
       <td>–</td>
-      <td></td>
+      <td><code>navigate_back()</code></td>
     </tr>
     <tr>
       <td><b>Navigation Home</b></td>
       <td>Adb command to go to the home screen of the mobile</td>
       <td>–</td>
-      <td></td>
+      <td><code>navigate_home()</code></td>
     </tr>
     <tr>
       <td><b>Long Press</b></td>
       <td>Long press at coordinate (x, y)</td>
       <td>dist([x, y], [x<sub>c</sub>, y<sub>c</sub>]) ≤ 14%</td>
-      <td></td>
+      <td><code>long_press(&lt;|box_start|&gt;(1,1)(2,2)&lt;|box_end|&gt;)</code></td>
     </tr>
     <tr>
       <td><b>Finish</b></td>
       <td>Indicate that navigation task has been completed</td>
       <td>–</td>
-      <td></td>
+      <td><code>finish()</code></td>
     </tr>
-    <tr>
+    <tr>w
       <td><b>Wait</b></td>
       <td>Wait for several seconds</td>
       <td>–</td>
-      <td></td>
+      <td><code>wait()</code></td>
     </tr>
     <tr>
       <td><b>Enter</b></td>
       <td>Adb command to press enter</td>
       <td>–</td>
-      <td></td>
+      <td><code>enter()</code></td>
     </tr>
     <tr>
       <td><b>Takeover</b></td>
       <td>Request user takeover</td>
       <td>–</td>
-      <td></td>
+      <td><code>take_over("请您选择照片并确认")</code></td>
     </tr>
     <tr>
       <td><b>Drag</b></td>
@@ -167,25 +167,25 @@ Note that all keywords are **case-sensitive**, and we use **compact JSON** (i.e.
         dist([x₁, y₁], [x<sub>1c</sub>, y<sub>1c</sub>]) ≤ 7.5%<br>
         and dist([x₂, y₂], [x<sub>2c</sub>, y<sub>2c</sub>]) ≤ 7.5%
       </td>
-      <td></td>
+      <td><code>drag(&lt;|box_start|&gt;(1,1)(2,2)&lt;|box_end|&gt;), (&lt;|box_start|&gt;(1,1)(2,2)&lt;|box_end|&gt;)</code></td>
     </tr>
     <tr>
       <td><b>Call API</b></td>
       <td>Adb command to <i>open</i> or <i>kill</i> app</td>
       <td>app = gt[app]<br>and open/kill = gt[operation]</td>
-      <td></td>
+      <td><code>call_api(墨迹天气, kill)</code></td>
     </tr>
     <tr>
       <td><b>Screenshot</b></td>
       <td>Adb command to take a screenshot</td>
       <td>–</td>
-      <td></td>
+      <td><code>screen_shot()</code></td>
     </tr>
     <tr>
       <td><b>Long Screenshot</b></td>
       <td>Adb command to take a long screenshot</td>
       <td>–</td>
-      <td></td>
+      <td><code>long_screen_shot()</code></td>
     </tr>
   </tbody>
 </table>
