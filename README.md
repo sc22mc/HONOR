@@ -90,22 +90,106 @@ At each step, the agent outputs is a single JSON object that contains:
 
 Note that all keywords are **case-sensitive**, and we use **compact JSON** (i.e., no extra whitespace), which affects the tokenizer’s behavior.
 
-| Action             | Description                                                             | Conditions for R<sub>acc</sub> = +2                                                                              |
-|--------------------|-------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|
-| **Tap**            | Click at coordinate (x, y)                                               | dist([x, y], [x<sub>c</sub>, y<sub>c</sub>]) ≤ 14%                                                               |
-| **Scroll**         | Scroll at coordinate (x, y) with direction up / down / left / right     | dist([x, y], [x<sub>c</sub>, y<sub>c</sub>]) ≤ 14% and direction = gt[direction]                                |
-| **Text Input**     | Type *text* at coordinate (x, y)                                         | dist([x, y], [x<sub>c</sub>, y<sub>c</sub>]) ≤ 14% and F1(text, gt[text]) > 0.5                                 |
-| **Navigation Back**| Adb command to go back to the previous page                             | –                                                                                                                |
-| **Navigation Home**| Adb command to go to the home screen of the mobile                      | –                                                                                                                |
-| **Long Press**     | Long Press at coordinate (x, y)                                          | dist([x, y], [x<sub>c</sub>, y<sub>c</sub>]) ≤ 14%                                                               |
-| **Finish**         | Indicate that navigate task has been completed                          | –                                                                                                                |
-| **Wait**           | wait for several seconds                                                 | –                                                                                                                |
-| **Enter**          | Adb command to press enter                                               | –                                                                                                                |
-| **Takeover**       | Request user takeover                                                    | –                                                                                                                |
-| **Drag**           | Drag from coordinate (x₁, y₁) to coordinate (x₂, y₂)                    | dist([x₁, y₁], [x<sub>1c</sub>, y<sub>1c</sub>]) ≤ 7.5% and dist([x₂, y₂], [x<sub>2c</sub>, y<sub>2c</sub>]) ≤ 7.5% |
-| **Call API**       | Adb command to *open/kill* app                                           | app = gt[app] and open/kill = gt[operation]                                                                      |
-| **Screenshot**     | Adb command to screenshot                                                | –                                                                                                                |
-| **Long Screenshot**| Adb command to long screenshot                                           | –                                                                                                                |
+<table>
+  <thead>
+    <tr>
+      <th>Action</th>
+      <th>Description</th>
+      <th>Conditions for R<sub>acc</sub> = +2</th>
+      <th>Example</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><b>Tap</b></td>
+      <td>Click at coordinate (x, y)</td>
+      <td>dist([x, y], [x<sub>c</sub>, y<sub>c</sub>]) ≤ 14%</td>
+      <td><code>tap(&lt;|box_start|&gt;(1,1)(2,2)&lt;|box_end|&gt;)</code></td>
+    </tr>
+    <tr>
+      <td><b>Scroll</b></td>
+      <td>Scroll at coordinate (x, y) with<br>direction up / down / left / right</td>
+      <td>dist([x, y], [x<sub>c</sub>, y<sub>c</sub>]) ≤ 14%<br>and direction = gt[direction]</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><b>Text Input</b></td>
+      <td>Type <i>text</i> at coordinate (x, y)</td>
+      <td>dist([x, y], [x<sub>c</sub>, y<sub>c</sub>]) ≤ 14%<br>and F1(text, gt[text]) > 0.5</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><b>Navigation Back</b></td>
+      <td>Adb command to go back to the previous page</td>
+      <td>–</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><b>Navigation Home</b></td>
+      <td>Adb command to go to the home screen of the mobile</td>
+      <td>–</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><b>Long Press</b></td>
+      <td>Long press at coordinate (x, y)</td>
+      <td>dist([x, y], [x<sub>c</sub>, y<sub>c</sub>]) ≤ 14%</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><b>Finish</b></td>
+      <td>Indicate that navigation task has been completed</td>
+      <td>–</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><b>Wait</b></td>
+      <td>Wait for several seconds</td>
+      <td>–</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><b>Enter</b></td>
+      <td>Adb command to press enter</td>
+      <td>–</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><b>Takeover</b></td>
+      <td>Request user takeover</td>
+      <td>–</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><b>Drag</b></td>
+      <td>Drag from coordinate (x₁, y₁) to (x₂, y₂)</td>
+      <td>
+        dist([x₁, y₁], [x<sub>1c</sub>, y<sub>1c</sub>]) ≤ 7.5%<br>
+        and dist([x₂, y₂], [x<sub>2c</sub>, y<sub>2c</sub>]) ≤ 7.5%
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><b>Call API</b></td>
+      <td>Adb command to <i>open</i> or <i>kill</i> app</td>
+      <td>app = gt[app]<br>and open/kill = gt[operation]</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><b>Screenshot</b></td>
+      <td>Adb command to take a screenshot</td>
+      <td>–</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><b>Long Screenshot</b></td>
+      <td>Adb command to take a long screenshot</td>
+      <td>–</td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+
 
 ## Evaluation Data
 
