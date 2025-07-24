@@ -173,7 +173,7 @@ Note that all keywords are **case-sensitive**, and we use **compact JSON** (i.e.
       <td><b>Call API</b></td>
       <td>Adb command to <i>open</i> or <i>kill</i> app</td>
       <td>app = gt[app]<br>and open/kill = gt[operation]</td>
-      <td><code>call_api(墨迹天气, kill)</code></td>
+      <td><code>call_api(api_name,operation)</code></td>
     </tr>
     <tr>
       <td><b>Screenshot</b></td>
@@ -426,20 +426,6 @@ python run_eval.py --data one_grounding --model your_model_path --mode all
 > \*Different train/test splits
 
 TM and EM stand for the **Type Match** and **Exact Match**, respectively. All evaluation data and code are open-sourced — see [here](eval) for details.
-
-## FAQs
-
-Click here to view the [FAQs](https://github.com/OpenBMB/AgentCPM-GUI/blob/main/eval/README.md#faqs).
-
-## Trends
-
-<a href="https://star-history.com/#OpenBMB/AgentCPM-GUI&Date">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=OpenBMB/AgentCPM-GUI&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=OpenBMB/AgentCPM-GUI&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=OpenBMB/AgentCPM-GUI&type=Date" />
- </picture>
-</a>
 
 ## License
 
