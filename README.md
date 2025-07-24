@@ -110,13 +110,13 @@ Note that all keywords are **case-sensitive**, and we use **compact JSON** (i.e.
       <td><b>Scroll</b></td>
       <td>Scroll at coordinate (x, y) with<br>direction up / down / left / right</td>
       <td>dist([x, y], [x<sub>c</sub>, y<sub>c</sub>]) ≤ 14%<br>and direction = gt[direction]</td>
-      <td><code>scroll(&lt;|box_start|&gt;(1,1)(2,2)&lt;|box_end|&gt;, "up")</code></td>
+      <td><code>scroll(x,y,direction)</code></td>
     </tr>
     <tr>
       <td><b>Text Input</b></td>
       <td>Type <i>text</i> at coordinate (x, y)</td>
       <td>dist([x, y], [x<sub>c</sub>, y<sub>c</sub>]) ≤ 14%<br>and F1(text, gt[text]) > 0.5</td>
-      <td><code>text(&lt;|box_start|&gt;(1,1)(2,2)&lt;|box_end|&gt;, "13 1205")</code></td>
+      <td><code>text(x,y,text_input)</code></td>
     </tr>
     <tr>
       <td><b>Navigation Back</b></td>
@@ -134,7 +134,7 @@ Note that all keywords are **case-sensitive**, and we use **compact JSON** (i.e.
       <td><b>Long Press</b></td>
       <td>Long press at coordinate (x, y)</td>
       <td>dist([x, y], [x<sub>c</sub>, y<sub>c</sub>]) ≤ 14%</td>
-      <td><code>long_press(&lt;|box_start|&gt;(1,1)(2,2)&lt;|box_end|&gt;)</code></td>
+      <td><code>long_press(x,y)</code></td>
     </tr>
     <tr>
       <td><b>Finish</b></td>
@@ -158,7 +158,7 @@ Note that all keywords are **case-sensitive**, and we use **compact JSON** (i.e.
       <td><b>Takeover</b></td>
       <td>Request user takeover</td>
       <td>–</td>
-      <td><code>take_over("请您选择照片并确认")</code></td>
+      <td><code>take_over(message)</code></td>
     </tr>
     <tr>
       <td><b>Drag</b></td>
@@ -167,7 +167,7 @@ Note that all keywords are **case-sensitive**, and we use **compact JSON** (i.e.
         dist([x₁, y₁], [x<sub>1c</sub>, y<sub>1c</sub>]) ≤ 7.5%<br>
         and dist([x₂, y₂], [x<sub>2c</sub>, y<sub>2c</sub>]) ≤ 7.5%
       </td>
-      <td><code>drag(&lt;|box_start|&gt;(1,1)(2,2)&lt;|box_end|&gt;), (&lt;|box_start|&gt;(1,1)(2,2)&lt;|box_end|&gt;)</code></td>
+      <td><code>drag(x1,y1,x2,y2)</code></td>
     </tr>
     <tr>
       <td><b>Call API</b></td>
