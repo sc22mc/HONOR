@@ -258,14 +258,14 @@ python run_eval.py --data one_grounding --model your_model_path --mode all
     <!-- Open-source Models -->
     <tr><td colspan="11"><em>Open-source Models</em></td></tr>
     <tr>
-      <td>InternVL-2-8B (Chen et al., 2024c)</td>
+      <td>InternVL-2-8B (Chen et al., 2024)</td>
       <td>30.1</td><td>2.8</td><td>1.3</td>
       <td>37.1</td><td>4.0</td><td>15.8</td>
       <td>17.1</td><td>6.0</td><td>1.3</td>
       <td>70.8</td>
     </tr>
     <tr>
-      <td>Qwen2-VL-7B (Wang et al., 2024c)</td>
+      <td>Qwen2-VL-7B (Wang et al., 2024)</td>
       <td>71.7</td><td>41.0</td><td>28.1</td>
       <td>73.6</td><td>43.9</td><td>41.5</td>
       <td>65.6</td><td>28.7</td><td>21.2</td>
@@ -300,7 +300,7 @@ python run_eval.py --data one_grounding --model your_model_path --mode all
       <td>57.0</td>
     </tr>
     <tr>
-      <td>AgentCPM-GUI (Zhang et al., 2025b)</td>
+      <td>AgentCPM-GUI (Zhang et al., 2025)</td>
       <td>84.3</td><td>92.2</td><td>75.1</td>
       <td>70.4</td><td>80.7</td><td>56.0</td>
       <td>72.3</td><td>54.6</td><td>39.4</td>
@@ -370,7 +370,7 @@ python run_eval.py --data one_grounding --model your_model_path --mode all
     <!-- Open-source Models -->
     <tr><td colspan="7"><em>Open-source Models</em></td></tr>
     <tr>
-      <td>Qwen2-VL-7B (Wang et al., 2024c)</td>
+      <td>Qwen2-VL-7B (Wang et al., 2024)</td>
       <td>55.7</td><td>36.2</td>
       <td>45.8</td><td>21.2</td>
       <td>58.6</td><td>13.3</td>
@@ -388,7 +388,7 @@ python run_eval.py --data one_grounding --model your_model_path --mode all
       <td>26.7</td><td>13.5</td>
     </tr>
     <tr>
-      <td>OS-Atlas-7B (Wu et al., 2024c)</td>
+      <td>OS-Atlas-7B (Wu et al., 2024)</td>
       <td>73.0</td><td>67.3</td>
       <td>70.4</td><td>56.5</td>
       <td>91.8*</td><td>76.8*</td>
@@ -400,7 +400,7 @@ python run_eval.py --data one_grounding --model your_model_path --mode all
       <td>86.1</td><td>67.9</td>
     </tr>
     <tr>
-      <td>AgentCPM-GUI (Zhang et al., 2025b)</td>
+      <td>AgentCPM-GUI (Zhang et al., 2025)</td>
       <td>94.4</td><td>90.2</td>
       <td>77.7</td><td>69.2</td>
       <td><b>90.9</b></td><td><b>75.0</b></td>
