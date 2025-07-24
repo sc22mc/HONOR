@@ -104,7 +104,7 @@ Note that all keywords are **case-sensitive**, and we use **compact JSON** (i.e.
       <td><b>Tap</b></td>
       <td>Click at coordinate (x, y)</td>
       <td>dist([x, y], [x<sub>c</sub>, y<sub>c</sub>]) ≤ 14%</td>
-      <td><code>tap(&lt;|box_start|&gt;(1,1)(2,2)&lt;|box_end|&gt;)</code></td>
+      <td><code>tap(x,y)</code></td>
     </tr>
     <tr>
       <td><b>Scroll</b></td>
