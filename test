@@ -1,16 +1,82 @@
-(swift_xmq2) root@mm-fudan-chai-l20-1-0:/opt/nas/p/dongshaokang/AgentCPM-GUI# /opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/infer_0729_test.sh
-+ export NCCL_IB_DISABLE=0
-+ NCCL_IB_DISABLE=0
-+ export NCCL_P2P_DISABLE=0
-+ NCCL_P2P_DISABLE=0
-+ export NCCL_SOCKET_IFNAME=eth0
-+ NCCL_SOCKET_IFNAME=eth0
-+ MODEL_PATH=/opt/nas/p/mm/ie_env/ruanhongtao/work_dirs/Qwen2_VL_checkpoints/Qwen2-VL-7B_RPA_Aug_annealing_v702_20250705/qwen2-vl-7b-instruct/v1-20250708-001845/checkpoint-1783
-+ MODEL_TYPE=qwen2_vl
-+ DATA_PATH=/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/finish_android_control_test_hl.jsonl
-+ OUTPUT_DIR=/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/CPT729/infer_full_hl
-+ RESULT_PATH=/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/CPT729/infer_full_hl/response_ac_hl_nothink.json
-+ LOG_PATH=/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/CPT729/infer_full_hl/infer.log
-+ mkdir -p /opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/CPT729/infer_full_hl
-+ CUDA_VISIBLE_DEVICES=0
-+ swift infer --model /opt/nas/p/mm/ie_env/ruanhongtao/work_dirs/Qwen2_VL_checkpoints/Qwen2-VL-7B_RPA_Aug_annealing_v702_20250705/qwen2-vl-7b-instruct/v1-20250708-001845/checkpoint-1783 --model_type qwen2_vl --val_dataset /opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/finish_android_control_test_hl.jsonl --infer_backend pt --max_batch_size 1 --temperature 0 --result_path /opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/CPT729/infer_full_hl/response_ac_hl_nothink.json --max_new_tokens 512
+run sh: `/opt/nas/p/conda/envs/swift2_kh/bin/python /opt/nas/p/mm/ie_env/kongh/ms-swift/swift/cli/infer.py --model /opt/nas/p/mm/ie_env/ruanhongtao/work_dirs/Qwen2_VL_checkpoints/Qwen2-VL-7B_RPA_Aug_annealing_v702_20250705/qwen2-vl-7b-instruct/v1-20250708-001845/checkpoint-1783 --model_type qwen2_vl --val_dataset /opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/finish_android_control_test_hl.jsonl --infer_backend pt --max_batch_size 1 --temperature 0 --result_path /opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/CPT729/infer_full_hl/response_ac_hl_nothink.json --max_new_tokens 512`
+[INFO:swift] Successfully registered `/opt/nas/p/mm/ie_env/kongh/ms-swift/swift/llm/data/dataset_info.json`
+[INFO:swift] No vLLM installed, if you are using vLLM, you will get `ImportError: cannot import name 'get_vllm_engine' from 'swift.llm'`
+[INFO:swift] No LMDeploy installed, if you are using LMDeploy, you will get `ImportError: cannot import name 'prepare_lmdeploy_engine_template' from 'swift.llm'`
+[INFO:swift] Start time of running main: 2025-07-29 12:53:05.376489
+usage: infer.py [-h] [--model_type MODEL_TYPE]
+                [--model_id_or_path MODEL_ID_OR_PATH]
+                [--model_revision MODEL_REVISION]
+                [--sft_type {lora,full,longlora,adalora,ia3,llamapro,vera,boft}]
+                [--template_type TEMPLATE_TYPE]
+                [--infer_backend {AUTO,vllm,pt,lmdeploy}]
+                [--ckpt_dir CKPT_DIR] [--result_dir RESULT_DIR]
+                [--load_args_from_ckpt_dir [LOAD_ARGS_FROM_CKPT_DIR]]
+                [--no_load_args_from_ckpt_dir]
+                [--load_dataset_config [LOAD_DATASET_CONFIG]]
+                [--eval_human EVAL_HUMAN] [--seed SEED]
+                [--dtype {bf16,fp16,fp32,AUTO}] [--model_kwargs MODEL_KWARGS]
+                [--dataset DATASET [DATASET ...]]
+                [--val_dataset VAL_DATASET [VAL_DATASET ...]]
+                [--dataset_seed DATASET_SEED]
+                [--dataset_test_ratio DATASET_TEST_RATIO]
+                [--show_dataset_sample SHOW_DATASET_SAMPLE]
+                [--save_result [SAVE_RESULT]] [--no_save_result]
+                [--system SYSTEM]
+                [--tools_prompt {react_en,react_zh,toolbench}]
+                [--max_length MAX_LENGTH]
+                [--truncation_strategy {delete,truncation_left}]
+                [--check_dataset_strategy {none,discard,error,warning}]
+                [--model_name MODEL_NAME [MODEL_NAME ...]]
+                [--model_author MODEL_AUTHOR [MODEL_AUTHOR ...]]
+                [--quant_method {bnb,hqq,eetq,awq,gptq,aqlm}]
+                [--quantization_bit {0,1,2,3,4,8}] [--hqq_axis {0,1}]
+                [--hqq_dynamic_config_path HQQ_DYNAMIC_CONFIG_PATH]
+                [--bnb_4bit_comp_dtype {fp16,bf16,fp32,AUTO}]
+                [--bnb_4bit_quant_type {fp4,nf4}]
+                [--bnb_4bit_use_double_quant [BNB_4BIT_USE_DOUBLE_QUANT]]
+                [--no_bnb_4bit_use_double_quant]
+                [--bnb_4bit_quant_storage BNB_4BIT_QUANT_STORAGE]
+                [--max_new_tokens MAX_NEW_TOKENS] [--do_sample DO_SAMPLE]
+                [--temperature TEMPERATURE] [--top_k TOP_K] [--top_p TOP_P]
+                [--repetition_penalty REPETITION_PENALTY]
+                [--num_beams NUM_BEAMS]
+                [--stop_words STOP_WORDS [STOP_WORDS ...]]
+                [--rope_scaling {linear,dynamic}]
+                [--use_flash_attn USE_FLASH_ATTN]
+                [--ignore_args_error [IGNORE_ARGS_ERROR]] [--stream [STREAM]]
+                [--no_stream] [--merge_lora [MERGE_LORA]]
+                [--merge_device_map MERGE_DEVICE_MAP]
+                [--save_safetensors [SAVE_SAFETENSORS]]
+                [--no_save_safetensors]
+                [--overwrite_generation_config [OVERWRITE_GENERATION_CONFIG]]
+                [--verbose VERBOSE] [--local_repo_path LOCAL_REPO_PATH]
+                [--custom_register_path CUSTOM_REGISTER_PATH]
+                [--custom_dataset_info CUSTOM_DATASET_INFO]
+                [--device_map_config DEVICE_MAP_CONFIG]
+                [--device_max_memory DEVICE_MAX_MEMORY [DEVICE_MAX_MEMORY ...]]
+                [--hub_token HUB_TOKEN]
+                [--gpu_memory_utilization GPU_MEMORY_UTILIZATION]
+                [--tensor_parallel_size TENSOR_PARALLEL_SIZE]
+                [--max_num_seqs MAX_NUM_SEQS] [--max_model_len MAX_MODEL_LEN]
+                [--disable_custom_all_reduce [DISABLE_CUSTOM_ALL_REDUCE]]
+                [--no_disable_custom_all_reduce]
+                [--enforce_eager [ENFORCE_EAGER]]
+                [--limit_mm_per_prompt LIMIT_MM_PER_PROMPT]
+                [--vllm_enable_lora [VLLM_ENABLE_LORA]]
+                [--vllm_max_lora_rank VLLM_MAX_LORA_RANK]
+                [--lora_modules LORA_MODULES [LORA_MODULES ...]]
+                [--max_logprobs MAX_LOGPROBS] [--tp TP]
+                [--cache_max_entry_count CACHE_MAX_ENTRY_COUNT]
+                [--quant_policy QUANT_POLICY]
+                [--vision_batch_size VISION_BATCH_SIZE]
+                [--self_cognition_sample SELF_COGNITION_SAMPLE]
+                [--train_dataset_sample TRAIN_DATASET_SAMPLE]
+                [--val_dataset_sample VAL_DATASET_SAMPLE]
+                [--safe_serialization SAFE_SERIALIZATION]
+                [--model_cache_dir MODEL_CACHE_DIR]
+                [--merge_lora_and_save MERGE_LORA_AND_SAVE]
+                [--custom_train_dataset_path CUSTOM_TRAIN_DATASET_PATH [CUSTOM_TRAIN_DATASET_PATH ...]]
+                [--custom_val_dataset_path CUSTOM_VAL_DATASET_PATH [CUSTOM_VAL_DATASET_PATH ...]]
+                [--vllm_lora_modules VLLM_LORA_MODULES [VLLM_LORA_MODULES ...]]
+                [--device_map_config_path DEVICE_MAP_CONFIG_PATH]
+infer.py: error: ambiguous option: --model could match --model_type, --model-type, --model_id_or_path, --model-id-or-path, --model_revision, --model-revision, --model_kwargs, --model-kwargs, --model_name, --model-name, --model_author, --model-author, --model_cache_dir, --model-cache-dir
