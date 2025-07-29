@@ -1,84 +1,16 @@
 import json
-import os
 
-def function(template_path, input_file, outout_file):
-    f = open(template_path).readlines()
-
-    input_list = []
-    for item in f:
-        item = json.loads(item)
-        input_list.append(item)
-
-    compare_list = {}
-
-    f = open(input_file).readlines()
-    for item in f:
-        item = json.loads(item)
-        compare_list[item["images"][0]["path"]] = item["response"]
-
-    for item in input_list:
-        img = item["image_path"]
-        response = compare_list[img]
-
-        if "before_trans" in item:
-            before_trans = item["before_trans"]
-            item["before_trans"] = response
-            item["generate_content"] = item["generate_content"].replace(before_trans, response)
-
-        result = {"STATUS": "continue"}
-        
-        # auxiliary function to extract coordinates
-        def extract_coords(s):
-            # directly find and extract the coordinates in the parentheses
-            start = s.find("(")
-            end = s.find(")")
-            if start != -1 and end != -1:
-                coords_str = s[start+1:end].strip()  # extract the content in (x,y)
-                x, y = coords_str.split(",")
-                return [int(x), int(y)]
-            raise ValueError(f"Cannot find coordinates in the string: {s}")
-        
-        if "tap(" in response:
-            result["POINT"] = extract_coords(response)
-            
-        elif "long_press(" in response:
-            result["POINT"] = extract_coords(response)
-            result["duration"] = 1000
-                
-        elif "text(" in response:
-            content = response.split(",")[-1][:-1]
-            result["TYPE"] = content
-            
-        elif "scroll(" in response:
-            direction = response.split(",")[-1][:-1]
-            result["POINT"] = [0, 0]  # screen center point
-            result["to"] = direction
-        elif "navigate_back" in response:
-            result["PRESS"] = "BACK"
-
-        elif "navigate_home" in response:
-             result["PRESS"] = "HOME"
-
-        elif "wait()" in response:
-            result["duration"] = 500
+def filter_template(input_file, output_file):
+    # 读取输入文件
+    with open(input_file, 'r', encoding='utf-8') as f:
+        data = json.load(f)
     
-        elif "finish()" in response or "Finish()" in response:
-            result["STATUS"] = "finish"
+    # 筛选出 image_path 包含 '11234' 或 '18310' 的条目
+    filtered_data = [item for item in data if '11234' in item.get('image_path', '') or '18310' in item.get('image_path', '')]
 
-        else:
-            print(response)
+    # 将筛选后的数据写入输出文件
+    with open(output_file, 'w', encoding='utf-8') as f:
+        json.dump(filtered_data, f, ensure_ascii=False, indent=4)
 
-        item["pred"] = result
-
-    outout_path = "/".join(outout_file.split("/")[:-1])
-    if not os.path.exists(outout_path):
-        os.makedirs(outout_path)
-    
-    with open(outout_file, 'w', encoding='utf-8') as f:
-        for item in input_list:
-            json_line = json.dumps(item, ensure_ascii=False)
-            f.write(json_line + '\n')
-
-function(template_path="/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_results/V1/CPT630/android_control_low_test_v1/all.jsonl",
-         input_file="/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/CPT729/infer_full_hl/response_ac_hl_nothink.json", 
-         outout_file='/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_results/V2-Finish-Test/CPT729/ac_low/all.jsonl')
+# 示例用法
+filter_template(input_file='template.json', output_file='filtered_template.json')
