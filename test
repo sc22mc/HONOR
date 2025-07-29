@@ -1,24 +1,19 @@
 import json
 
 def convert_jsonl(input_file, output_file):
-    # 打开输入的 JSONL 文件并读取所有行
+    # 打开输入的 JSON 文件并读取数据
     with open(input_file, 'r', encoding='utf-8') as infile:
-        # 逐行读取输入文件
-        lines = infile.readlines()
+        # 读取原始数据
+        data = json.load(infile)
 
     # 打开输出文件，将处理后的数据写入
     with open(output_file, 'w', encoding='utf-8') as outfile:
-        for line in lines:
-            try:
-                # 将每一行从 JSON 格式转换为字典对象
-                json_object = json.loads(line.strip())
-                # 将字典对象转换为 JSON 格式并写入文件，每个对象占一行
-                outfile.write(json.dumps(json_object, ensure_ascii=False) + '\n')
-            except json.JSONDecodeError:
-                print(f"Error decoding line: {line.strip()}")  # 如果解码失败，打印错误
+        for item in data:
+            # 将每个字典对象转换为 JSON 格式并写入文件，每个对象占一行
+            outfile.write(json.dumps(item, ensure_ascii=False) + '\n')
 
 # 示例文件路径
-input_file = 'input.jsonl'  # 输入的原始 JSONL 文件
+input_file = 'input.json'  # 输入的原始 JSON 文件
 output_file = 'output.jsonl'  # 输出的处理后 JSONL 文件
 
 convert_jsonl(input_file, output_file)
