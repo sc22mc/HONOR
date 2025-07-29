@@ -1,25 +1,10 @@
-import json
-
-def filter_template(input_file, output_file):
-    filtered_data = []
-    
-    # 逐行读取 JSONL 文件
-    with open(input_file, 'r', encoding='utf-8') as f:
-        for line in f:
-            try:
-                item = json.loads(line)  # 解析每一行的 JSON 数据
-                # 筛选出 image_path 包含 '11234' 或 '18310' 的条目
-                if '11234' in item.get('image_path', '') or '18310' in item.get('image_path', ''):
-                    filtered_data.append(item)
-            except json.JSONDecodeError:
-                print(f"Skipping invalid JSON line: {line}")
-    
-    # 将筛选后的数据写入输出文件
-    with open(output_file, 'w', encoding='utf-8') as f:
-        for item in filtered_data:
-            json.dump(item, f, ensure_ascii=False)
-            f.write('\n')  # 每个 JSON 对象后加换行符
-
-# 示例用法
-filter_template(input_file='/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_results/V1/CPT630/android_control_low_test_v1/all_copy.jsonl', 
-                output_file='/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_results/V1/CPT630/android_control_low_test_v1/all_copy2.jsonl')
+Traceback (most recent call last):
+  File "/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/AgentCPM-GUI/eval/eval_data/process_ac.py", line 6, in <module>
+    from android_env.proto.a11y import android_accessibility_forest_pb2
+  File "/opt/nas/p/conda/envs/process_data/lib/python3.11/site-packages/android_env/proto/a11y/android_accessibility_forest_pb2.py", line 12, in <module>
+    _runtime_version.ValidateProtobufRuntimeVersion(
+  File "/opt/nas/p/conda/envs/process_data/lib/python3.11/site-packages/google/protobuf/runtime_version.py", line 106, in ValidateProtobufRuntimeVersion
+    _ReportVersionError(
+  File "/opt/nas/p/conda/envs/process_data/lib/python3.11/site-packages/google/protobuf/runtime_version.py", line 50, in _ReportVersionError
+    raise VersionError(msg)
+google.protobuf.runtime_version.VersionError: Detected mismatched Protobuf Gencode/Runtime major versions when loading android_env/proto/a11y/android_accessibility_forest.proto: gencode 6.31.1 runtime 5.29.5. Same major version is required. See Protobuf version guarantees at https://protobuf.dev/support/cross-version-runtime-guarantee.
