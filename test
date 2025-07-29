@@ -1,25 +1,89 @@
-(torch_zhangsh) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3# pip install qwen_vl_utils
-Looking in indexes: http://aptps.cloud.hihonor.com/repository/pypi-proxy/simple
-Requirement already satisfied: qwen_vl_utils in /opt/nas/p/conda/envs/eval_xmq/lib/python3.10/site-packages (0.0.11)
-Requirement already satisfied: av in /opt/nas/p/conda/envs/eval_xmq/lib/python3.10/site-packages (from qwen_vl_utils) (13.1.0)
-Requirement already satisfied: packaging in /opt/nas/p/conda/envs/eval_xmq/lib/python3.10/site-packages (from qwen_vl_utils) (25.0)
-Requirement already satisfied: pillow in /opt/nas/p/conda/envs/eval_xmq/lib/python3.10/site-packages (from qwen_vl_utils) (10.4.0)
-Requirement already satisfied: requests in /opt/nas/p/conda/envs/eval_xmq/lib/python3.10/site-packages (from qwen_vl_utils) (2.32.3)
-Requirement already satisfied: charset-normalizer<4,>=2 in /opt/nas/p/conda/envs/eval_xmq/lib/python3.10/site-packages (from requests->qwen_vl_utils) (3.2.0)
-Requirement already satisfied: idna<4,>=2.5 in /opt/nas/p/conda/envs/eval_xmq/lib/python3.10/site-packages (from requests->qwen_vl_utils) (3.4)
-Requirement already satisfied: urllib3<3,>=1.21.1 in /opt/nas/p/conda/envs/eval_xmq/lib/python3.10/site-packages (from requests->qwen_vl_utils) (1.26.18)
-Requirement already satisfied: certifi>=2017.4.17 in /opt/nas/p/conda/envs/eval_xmq/lib/python3.10/site-packages (from requests->qwen_vl_utils) (2023.7.22)
-WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
-(torch_zhangsh) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3# python -m pdb /opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/AgentCPM-GUI/eval/run_predict_honor_2.py --model_path /opt/nas/p/mm/ie_env/ruanhongtao/work_dirs/Qwen2_VL_checkpoints/Qwen2-VL-7B_RPA_Aug_annealing_v702_20250705/qwen2-vl-7b-instruct/v1-20250708-001845/checkpoint-1783 --output_dir /opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/ac-ossdy-test
-> /opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/AgentCPM-GUI/eval/run_predict_honor_2.py(1)<module>()
--> import base64
-(Pdb) b 23
-Breakpoint 1 at /opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/AgentCPM-GUI/eval/run_predict_honor_2.py:23
-(Pdb) c
-> /opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/AgentCPM-GUI/eval/run_predict_honor_2.py(23)<module>()
--> from qwen_vl_utils import process_vision_info
-(Pdb) n
-ModuleNotFoundError: No module named 'qwen_vl_utils'
-> /opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/AgentCPM-GUI/eval/run_predict_honor_2.py(23)<module>()
--> from qwen_vl_utils import process_vision_info
-(Pdb) 
+set -x
+
+# 设置数据缓存路径到非共享目录，否则可能出现读写冲突
+# export HF_HOME="/opt/nas/p/mm/ie_env/minqi/train_qwen/data_cache"
+
+# 环境变量设置，查询NCCL相关信息通过vc -nccl list
+# export CUDA_DEVICE_MAX_CONNECTIONS=1
+# export NCCL_SOCKET_IFNAME=eth0
+# export NCCL_IB_DISABLE=0
+# export NCCL_P2P_DISABLE=0
+# export NCCL_IB_TIMEOUT=22
+# export NCCL_IB_GID_INDEX=3
+# export NCCL_IB_TC=160
+# export NCCL_NET_GDR_LEVEL=2
+# export NCCL_IB_HCA=mlx5_bond_0,mlx5_bond_1,mlx5_bond_2,mlx5_bond_3,mlx5_bond_4,mlx5_bond_5,mlx5_bond_6,mlx5_bond_7
+# export NCCL_ALGO=Ring
+# export MKL_SERVICE_FORCE_INTEL=1
+
+export NCCL_IB_DISABLE=0
+export NCCL_P2P_DISABLE=0
+export NCCL_SOCKET_IFNAME=eth0
+
+
+for EVAL_DATA in "ac_hl_nothink" "ac_ll_nothink"
+do  
+    for MODEL_PATH_0 in ""/opt/nas/p/dongshaokang/fundmental_model/ui_agent_data/gui_task_v630_lock_data/Qwen2-VL-7B_RPA_Aug_v630D_Finish_20250623""
+    do
+        if [[ $MODEL_PATH_0 == *"qwen2_5_vl"*  ]]; then
+            model_type="qwen2_5_vl"
+        elif [[ $MODEL_PATH_0 == *"500_steps_model"*  ]]; then
+            model_type="qwen2_5_vl"
+        else
+            model_type="qwen2_vl"
+        fi
+
+        if [ "$EVAL_DATA" == "ac_hl_nothink" ]; then
+            DATA_PATH_0="/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/finish_android_control_test_hl.jsonl"
+            OUTPUT_PATH="/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/CPT630D/infer_full_hl"
+        elif [ "$EVAL_DATA" == "ac_ll_nothink" ]; then
+            DATA_PATH_0="/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/finish_android_control_test_ll.jsonl"
+            OUTPUT_PATH="/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/CPT630D/infer_full_ll"
+        fi
+
+        # 训练设置
+        MODEL_PATH=$MODEL_PATH_0
+        DATA_PATH=$DATA_PATH_0
+
+        WORK_DIR="/opt/nas/p/dongshaokang/ms-swift-test-dynamic-training"
+        mkdir -p $OUTPUT_PATH
+        result_path=${OUTPUT_PATH}/response_${EVAL_DATA}.json
+
+        nproc_per_node=4
+        nnodes=1
+        node_rank=${1:-0}
+        PER_DEVICE_BATCH_SIZE=3
+        GRADIENT_ACC=4
+        # total_batch_size=$((PER_DEVICE_BATCH_SIZE * GRADIENT_ACC * nproc_per_node * nnodes))
+        
+        SUFFIX="inference-rank$node_rank"
+        NPROC_PER_NODE=${nproc_per_node} \
+        NNODES=${nnodes} \
+        NODE_RANK=${node_rank} \
+        MASTER_ADDR=10.80.67.176  \
+        MASTER_PORT=2576 \
+        MAX_PIXELS=602112 \
+        CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 \
+        swift infer \
+            --model $MODEL_PATH_0 \
+            --model_type $model_type \
+            --val_dataset $DATA_PATH_0 \
+            --infer_backend pt \
+            --max_batch_size $PER_DEVICE_BATCH_SIZE \
+            --temperature 0 \
+            --result_path $result_path \
+            --max_new_tokens 512 &> "$OUTPUT_PATH/$SUFFIX.log"
+        
+        GPU_USAGE=$(nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits -i 0)
+        MEMORY_INFO=$(nvidia-smi --query-gpu=memory.used --format=csv,noheader,nounits -i 0)
+        THRESHOLD=3
+        THRESHOLD_MEMORY=10000
+
+        while [ "$MEMORY_INFO" -gt "$THRESHOLD_MEMORY" ]
+        do
+            sleep 240
+            GPU_USAGE=$(nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits -i 0)
+            MEMORY_INFO=$(nvidia-smi --query-gpu=memory.used --format=csv,noheader,nounits -i 0)
+        done
+    done
+done
