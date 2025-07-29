@@ -1,11 +1,2 @@
-(dsk_swift_v3dynamic) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3# pip show ms-swift
-Name: ms_swift
-Version: 3.2.1
-Summary: Swift: Scalable lightWeight Infrastructure for Fine-Tuning
-Home-page: https://github.com/modelscope/swift
-Author: DAMO ModelScope teams
-Author-email: contact@modelscope.cn
-License: Apache License 2.0
-Location: /opt/nas/p/conda/envs/dsk_swift_v3dynamic/lib/python3.10/site-packages
-Requires: accelerate, addict, aiohttp, attrdict, binpacking, charset-normalizer, cpm-kernels, dacite, datasets, einops, fastapi, gradio, importlib-metadata, jieba, matplotlib, modelscope, nltk, numpy, openai, oss2, pandas, peft, pillow, requests, rouge, safetensors, sentencepiece, tensorboard, tiktoken, tqdm, transformers, transformers-stream-generator, trl, uvicorn, zstandard
-Required-by: 
+(base) root@mm-fudan-chai-l20-1-0:/opt/nas/p/conda/envs/dsk_swift_v3dynamic/lib/python3.10/site-packages/ms_swift-3.2.1.dist-info# ls
+entry_points.txt  INSTALLER  LICENSE  METADATA  RECORD  REQUESTED  top_level.txt  WHEEL
