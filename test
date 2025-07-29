@@ -1,29 +1,16 @@
-#!/bin/bash
-set -x  # 开启调试输出
-
-# 设置 NCCL 环境变量（单卡也可以保留，兼容性好）
-export NCCL_IB_DISABLE=0
-export NCCL_P2P_DISABLE=0
-export NCCL_SOCKET_IFNAME=eth0
-
-# 固定模型和数据路径
-MODEL_PATH="/opt/nas/p/dongshaokang/fundmental_model/ui_agent_data/gui_task_v630_lock_data/Qwen2-VL-7B_RPA_Aug_v630D_Finish_20250623"
-MODEL_TYPE="qwen2_vl"
-DATA_PATH="/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/finish_android_control_test_hl.jsonl"
-OUTPUT_DIR="/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/CPT630D/infer_full_hl"
-RESULT_PATH="$OUTPUT_DIR/response_ac_hl_nothink.json"
-LOG_PATH="$OUTPUT_DIR/infer.log"
-
-# 创建输出目录
-mkdir -p "$OUTPUT_DIR"
-
-# 单卡推理
-CUDA_VISIBLE_DEVICES=0 swift infer \
-    --model "$MODEL_PATH" \
-    --model_type "$MODEL_TYPE" \
-    --val_dataset "$DATA_PATH" \
-    --infer_backend pt \
-    --max_batch_size 1 \
-    --temperature 0 \
-    --result_path "$RESULT_PATH" \
-    --max_new_tokens 512 &>> "$LOG_PATH"
+(swift_xmq2) root@mm-fudan-chai-l20-1-0:/opt/nas/p/dongshaokang/AgentCPM-GUI# /opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/infer_0729_test.sh
++ export NCCL_IB_DISABLE=0
++ NCCL_IB_DISABLE=0
++ export NCCL_P2P_DISABLE=0
++ NCCL_P2P_DISABLE=0
++ export NCCL_SOCKET_IFNAME=eth0
++ NCCL_SOCKET_IFNAME=eth0
++ MODEL_PATH=/opt/nas/p/mm/ie_env/ruanhongtao/work_dirs/Qwen2_VL_checkpoints/Qwen2-VL-7B_RPA_Aug_annealing_v702_20250705/qwen2-vl-7b-instruct/v1-20250708-001845/checkpoint-1783
++ MODEL_TYPE=qwen2_vl
++ DATA_PATH=/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/finish_android_control_test_hl.jsonl
++ OUTPUT_DIR=/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/CPT729/infer_full_hl
++ RESULT_PATH=/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/CPT729/infer_full_hl/response_ac_hl_nothink.json
++ LOG_PATH=/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/CPT729/infer_full_hl/infer.log
++ mkdir -p /opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/CPT729/infer_full_hl
++ CUDA_VISIBLE_DEVICES=0
++ swift infer --model /opt/nas/p/mm/ie_env/ruanhongtao/work_dirs/Qwen2_VL_checkpoints/Qwen2-VL-7B_RPA_Aug_annealing_v702_20250705/qwen2-vl-7b-instruct/v1-20250708-001845/checkpoint-1783 --model_type qwen2_vl --val_dataset /opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/finish_android_control_test_hl.jsonl --infer_backend pt --max_batch_size 1 --temperature 0 --result_path /opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/CPT729/infer_full_hl/response_ac_hl_nothink.json --max_new_tokens 512
