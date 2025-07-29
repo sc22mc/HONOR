@@ -1,10 +1,24 @@
-Traceback (most recent call last):
-  File "/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/AgentCPM-GUI/eval/eval_data/process_ac.py", line 6, in <module>
-    from android_env.proto.a11y import android_accessibility_forest_pb2
-  File "/opt/nas/p/conda/envs/process_data/lib/python3.11/site-packages/android_env/proto/a11y/android_accessibility_forest_pb2.py", line 12, in <module>
-    _runtime_version.ValidateProtobufRuntimeVersion(
-  File "/opt/nas/p/conda/envs/process_data/lib/python3.11/site-packages/google/protobuf/runtime_version.py", line 106, in ValidateProtobufRuntimeVersion
-    _ReportVersionError(
-  File "/opt/nas/p/conda/envs/process_data/lib/python3.11/site-packages/google/protobuf/runtime_version.py", line 50, in _ReportVersionError
-    raise VersionError(msg)
-google.protobuf.runtime_version.VersionError: Detected mismatched Protobuf Gencode/Runtime major versions when loading android_env/proto/a11y/android_accessibility_forest.proto: gencode 6.31.1 runtime 5.29.5. Same major version is required. See Protobuf version guarantees at https://protobuf.dev/support/cross-version-runtime-guarantee.
+import json
+
+def convert_jsonl(input_file, output_file):
+    # 打开并读取输入的 JSONL 文件
+    with open(input_file, 'r', encoding='utf-8') as infile:
+        # 读取文件中的所有行，并解析成 JSON 对象
+        lines = infile.readlines()
+
+    # 打开输出文件，将处理后的数据写入
+    with open(output_file, 'w', encoding='utf-8') as outfile:
+        for line in lines:
+            # 将每行数据从 JSON 格式转换为字典对象
+            try:
+                json_object = json.loads(line.strip())
+                # 将字典对象转换为 JSON 格式并写入文件
+                outfile.write(json.dumps(json_object, ensure_ascii=False) + '\n')
+            except json.JSONDecodeError:
+                print(f"Error decoding line: {line.strip()}")  # 如果解码出错，打印错误
+
+# 示例用法
+input_file = 'input.jsonl'  # 输入的 JSONL 文件
+output_file = 'output.jsonl'  # 输出的 JSONL 文件
+
+convert_jsonl(input_file, output_file)
