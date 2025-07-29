@@ -1,2 +1,1 @@
-(base) root@mm-fudan-chai-l20-1-0:/opt/nas/p/conda/envs/dsk_swift_v3dynamic/lib/python3.10/site-packages/ms_swift-3.2.1.dist-info# ls
-entry_points.txt  INSTALLER  LICENSE  METADATA  RECORD  REQUESTED  top_level.txt  WHEEL
+ls /opt/nas/p/conda/envs/dsk_swift_v3dynamic/lib/python3.10/site-packages/ms_swift
