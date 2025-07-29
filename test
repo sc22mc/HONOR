@@ -1,33 +1,76 @@
-#!/opt/nas/p/conda/envs/swift_xmq2/bin/python
-# EASY-INSTALL-ENTRY-SCRIPT: 'ms-swift','console_scripts','swift'
-import re
-import sys
-
-# for compatibility with easy_install; see #2198
-__requires__ = 'ms-swift'
-
-try:
-    from importlib.metadata import distribution
-except ImportError:
-    try:
-        from importlib_metadata import distribution
-    except ImportError:
-        from pkg_resources import load_entry_point
-
-
-def importlib_load_entry_point(spec, group, name):
-    dist_name, _, _ = spec.partition('==')
-    matches = (
-        entry_point
-        for entry_point in distribution(dist_name).entry_points
-        if entry_point.group == group and entry_point.name == name
-    )
-    return next(matches).load()
-
-
-globals().setdefault('load_entry_point', importlib_load_entry_point)
-
-
-if __name__ == '__main__':
-    sys.argv[0] = re.sub(r'(-script\.pyw?|\.exe)?$', '', sys.argv[0])
-    sys.exit(load_entry_point('ms-swift', 'console_scripts', 'swift')())
+(swift_xmq2) root@mm-fudan-chai-l20-1-0:/opt/nas/p/dongshaokang/AgentCPM-GUI# /opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/infer_0729_test.sh
+++ export NCCL_IB_DISABLE=0
+++ NCCL_IB_DISABLE=0
+++ export NCCL_P2P_DISABLE=0
+++ NCCL_P2P_DISABLE=0
+++ export NCCL_SOCKET_IFNAME=eth0
+++ NCCL_SOCKET_IFNAME=eth0
+++ for EVAL_DATA in "ac_hl_nothink" "ac_ll_nothink"
+++ for MODEL_PATH_0 in ""/opt/nas/p/dongshaokang/fundmental_model/ui_agent_data/gui_task_v630_lock_data/Qwen2-VL-7B_RPA_Aug_v630D_Finish_20250623""
+++ [[ /opt/nas/p/dongshaokang/fundmental_model/ui_agent_data/gui_task_v630_lock_data/Qwen2-VL-7B_RPA_Aug_v630D_Finish_20250623 == *\q\w\e\n\2\_\5\_\v\l* ]]
+++ [[ /opt/nas/p/dongshaokang/fundmental_model/ui_agent_data/gui_task_v630_lock_data/Qwen2-VL-7B_RPA_Aug_v630D_Finish_20250623 == *\5\0\0\_\s\t\e\p\s\_\m\o\d\e\l* ]]
+++ model_type=qwen2_vl
+++ '[' ac_hl_nothink == ac_hl_nothink ']'
+++ DATA_PATH_0=/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/finish_android_control_test_hl.jsonl
+++ OUTPUT_PATH=/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/CPT630D/infer_full_hl
+++ MODEL_PATH=/opt/nas/p/dongshaokang/fundmental_model/ui_agent_data/gui_task_v630_lock_data/Qwen2-VL-7B_RPA_Aug_v630D_Finish_20250623
+++ DATA_PATH=/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/finish_android_control_test_hl.jsonl
+++ WORK_DIR=/opt/nas/p/dongshaokang/ms-swift-test-dynamic-training
+++ mkdir -p /opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/CPT630D/infer_full_hl
+++ result_path=/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/CPT630D/infer_full_hl/response_ac_hl_nothink.json
+++ nproc_per_node=4
+++ nnodes=1
+++ node_rank=0
+++ PER_DEVICE_BATCH_SIZE=3
+++ GRADIENT_ACC=4
+++ SUFFIX=inference-rank0
+++ NPROC_PER_NODE=4
+++ NNODES=1
+++ NODE_RANK=0
+++ MASTER_ADDR=10.80.67.176
+++ MASTER_PORT=2576
+++ MAX_PIXELS=602112
+++ CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
+++ swift infer --model /opt/nas/p/dongshaokang/fundmental_model/ui_agent_data/gui_task_v630_lock_data/Qwen2-VL-7B_RPA_Aug_v630D_Finish_20250623 --model_type qwen2_vl --val_dataset /opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/finish_android_control_test_hl.jsonl --infer_backend pt --max_batch_size 3 --temperature 0 --result_path /opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/CPT630D/infer_full_hl/response_ac_hl_nothink.json --max_new_tokens 512
++++ nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits -i 0
+++ GPU_USAGE=0
++++ nvidia-smi --query-gpu=memory.used --format=csv,noheader,nounits -i 0
+++ MEMORY_INFO=290
+++ THRESHOLD=3
+++ THRESHOLD_MEMORY=10000
+++ '[' 290 -gt 10000 ']'
+++ for EVAL_DATA in "ac_hl_nothink" "ac_ll_nothink"
+++ for MODEL_PATH_0 in ""/opt/nas/p/dongshaokang/fundmental_model/ui_agent_data/gui_task_v630_lock_data/Qwen2-VL-7B_RPA_Aug_v630D_Finish_20250623""
+++ [[ /opt/nas/p/dongshaokang/fundmental_model/ui_agent_data/gui_task_v630_lock_data/Qwen2-VL-7B_RPA_Aug_v630D_Finish_20250623 == *\q\w\e\n\2\_\5\_\v\l* ]]
+++ [[ /opt/nas/p/dongshaokang/fundmental_model/ui_agent_data/gui_task_v630_lock_data/Qwen2-VL-7B_RPA_Aug_v630D_Finish_20250623 == *\5\0\0\_\s\t\e\p\s\_\m\o\d\e\l* ]]
+++ model_type=qwen2_vl
+++ '[' ac_ll_nothink == ac_hl_nothink ']'
+++ '[' ac_ll_nothink == ac_ll_nothink ']'
+++ DATA_PATH_0=/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/finish_android_control_test_ll.jsonl
+++ OUTPUT_PATH=/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/CPT630D/infer_full_ll
+++ MODEL_PATH=/opt/nas/p/dongshaokang/fundmental_model/ui_agent_data/gui_task_v630_lock_data/Qwen2-VL-7B_RPA_Aug_v630D_Finish_20250623
+++ DATA_PATH=/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/finish_android_control_test_ll.jsonl
+++ WORK_DIR=/opt/nas/p/dongshaokang/ms-swift-test-dynamic-training
+++ mkdir -p /opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/CPT630D/infer_full_ll
+++ result_path=/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/CPT630D/infer_full_ll/response_ac_ll_nothink.json
+++ nproc_per_node=4
+++ nnodes=1
+++ node_rank=0
+++ PER_DEVICE_BATCH_SIZE=3
+++ GRADIENT_ACC=4
+++ SUFFIX=inference-rank0
+++ NPROC_PER_NODE=4
+++ NNODES=1
+++ NODE_RANK=0
+++ MASTER_ADDR=10.80.67.176
+++ MASTER_PORT=2576
+++ MAX_PIXELS=602112
+++ CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
+++ swift infer --model /opt/nas/p/dongshaokang/fundmental_model/ui_agent_data/gui_task_v630_lock_data/Qwen2-VL-7B_RPA_Aug_v630D_Finish_20250623 --model_type qwen2_vl --val_dataset /opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/finish_android_control_test_ll.jsonl --infer_backend pt --max_batch_size 3 --temperature 0 --result_path /opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/CPT630D/infer_full_ll/response_ac_ll_nothink.json --max_new_tokens 512
++++ nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits -i 0
+++ GPU_USAGE=0
++++ nvidia-smi --query-gpu=memory.used --format=csv,noheader,nounits -i 0
+++ MEMORY_INFO=290
+++ THRESHOLD=3
+++ THRESHOLD_MEMORY=10000
+++ '[' 290 -gt 10000 ']'
