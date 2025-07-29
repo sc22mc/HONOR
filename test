@@ -1,0 +1,415 @@
+import base64
+import sys
+import argparse
+import re
+import copy
+import multiprocessing
+import os
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+os.environ["VLLM_WORKER_MULTIPROC_METHOD"] = "spawn"
+os.environ["VLLM_ALLOW_DEPRECATED_BEAM_SEARCH"]="1"
+import json
+import yaml
+import time
+import torch
+import random
+from yacs.config import CfgNode as CN
+import re
+import numpy as np
+import requests
+import jsonschema
+from tqdm import tqdm
+from transformers import AutoTokenizer,AutoModelForCausalLM
+from transformers import Qwen2VLForConditionalGeneration, AutoTokenizer, AutoProcessor
+from qwen_vl_utils import process_vision_info
+from utils.qwen_mobile_tool import aitw_2_honors
+from concurrent.futures import ProcessPoolExecutor,as_completed,ThreadPoolExecutor
+from PIL import Image
+from utils.utils import get_dataset_dir
+DEVICES = [
+    "cuda:0", 
+    "cuda:1", 
+    "cuda:2", "cuda:3",
+    "cuda:4", "cuda:5", "cuda:6", "cuda:7",
+    ]
+torch.set_num_threads(4)
+USE_LOW_INSTRUCTION = False
+
+# Get the absolute path of the current file
+current_file_path = os.path.abspath(__file__)
+current_dir = os.path.dirname(current_file_path)
+
+# Add the current file's directory to sys.path
+if current_dir not in sys.path:
+    sys.path.append(current_dir)
+    
+
+def compact_json_dumps(obj):
+    return json.dumps(obj, indent=None, separators=(",", ":"), ensure_ascii=False)
+
+
+NO_THOUGHT_EXAMPLE = {"Press":"BACK"}
+SYSTEM_PROMPT = "You are a helpful assistant."
+
+
+_llm = None
+_tokenizer = None
+
+def _init_llm(model_name):
+    global _llm,_tokenizer
+    if _llm is None:
+        _llm = Qwen2VLForConditionalGeneration.from_pretrained(
+            model_name,   trust_remote_code=True,  torch_dtype=torch.bfloat16,
+            #attn_implementation="flash_attention_2",
+        )
+    if _tokenizer is None:
+        _tokenizer = AutoProcessor.from_pretrained(model_name, trust_remote_code=True)
+
+def move_to(device):
+    global _llm,_tokenizer
+    if _llm is None:
+        raise ValueError("Error, LLM is not initialized.")
+    _llm = _llm.to(device)
+    if _tokenizer is None:
+        raise ValueError("Error, Tokenizer is not initialized.")
+    # return _llm,_tokenizer
+    return f"Moved to {device}"
+def build_history_actions_str(history_list):
+    history = ""
+    
+    # Get indices of the last 4 image records
+    # image_indices = range(max(0, len(history_list) - 4), len(history_list))
+    image_indices = range(0, len(history_list))
+    for i, step_history in enumerate(history_list):
+     # If current index is in the last 4 image records, add the image
+        if i in image_indices:
+            item_low_instruction = step_history.get("low_instruction", "")
+            history += item_low_instruction + " \n"
+    return history
+
+# def run_episode_low(episode, image_path,history_list,use_low_instruction):
+#     #print(msg)
+#     #print(episode)
+#     try:
+#         global _llm,_tokenizer
+#         torch.cuda.empty_cache()
+#         # msg[0]["content"].append(img)
+#         instruction = episode["low_instruction"]
+#         history = build_history_actions_str(history_list)
+#         text = ("You are a well-trained mobile intelligent agent capable of assisting users with step-by-step navigation tasks. Given the current smartphone screenshot and the user instruction: \n {instruction} \n Please output the correct function call to accomplish the user instruction. Besides the function call, you should not output any other content.\nYou can call the following functions to control the smartphone.\n- UI Basic Operations:\n    1. tap(x: float,y: float) This function is used to click on a specific point on the smartphone screen. The coordinates x and y indicate the click position.  \n    2. scroll(x: float, y: float,direction: str) This function is used to swipe from the starting coordinates (x, y) in the specified direction. The coordinates x and y represent the center position of the control to be swiped. The direction can be \"up\", \"down\", \"left\", or \"right\".\n    3. text(x: float,y: float,text_input: str) This function is used to input the specified text at the given coordinates. The coordinates x and y represent the center position of the control to be clicked.\n- Phone Key Operations:\n    4. navigate_back() This function is used to return to the previous screen on the smartphone.\n    5. navigate_home() This function is used to return to the home screen of the phone.\n- Other Operations:\n    6. long_press(x: float,y: float) This function is used to perform a long press action at a specific point on the smartphone screen. The coordinates x and y indicate the long press position.\n    7. wait() This function is to wait at current page.\n    ").format(instruction=instruction)
+#         conversation = [
+#             {
+#                 "role": "system",
+#                 "content": SYSTEM_PROMPT
+#             },
+#             {
+#                 "role": "user",
+#                 "content": [
+#                     {"type": "text", "text": text},
+#                     {"type": "image", "image": image_path},
+#                 ],
+#             },
+#         ]
+#         conversation.extend(history)
+
+#         text_prompt = _tokenizer.apply_chat_template(conversation, tokenize=False,add_generation_prompt=True)
+#         print(text_prompt)
+#         # Excepted output: '<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n<|im_start|>user\n<|vision_start|><|image_pad|><|vision_end|>Describe this image.<|im_end|>\n<|im_start|>assistant\n'
+#         image_inputs, video_inputs = process_vision_info(conversation)
+#         inputs = _tokenizer(
+#             text=[text_prompt],
+#             images=image_inputs,
+#             videos=video_inputs,
+#             padding=True,
+#             return_tensors="pt",
+#         )
+#         device = _llm.device
+#         inputs = inputs.to(device)
+
+#         # Inference: Generation of the output
+#         output_ids = _llm.generate(**inputs, max_new_tokens=128,temperature=0.1)
+#         generated_ids = [
+#             output_ids[len(input_ids) :]
+#             for input_ids, output_ids in zip(inputs.input_ids, output_ids)
+#         ]
+#         output_text = _tokenizer.batch_decode(
+#             generated_ids, skip_special_tokens=True, clean_up_tokenization_spaces=True
+#         )
+#         print(output_text[0])
+
+#         generate_content = _tokenizer.batch_decode(
+#             output_ids, skip_special_tokens=True, clean_up_tokenization_spaces=True
+#         )
+#         print(generate_content[0])
+
+#         episode["generate_content"] = generate_content[0]
+#         episode["before_trans"] = output_text[0]
+#         episode["pred"] = honor2minicpm(output_text[0])
+#         print(episode["pred"])
+#     except Exception as e:
+#         print(f"Error: {e}")
+#         import traceback
+#         print('traceback:', traceback.format_exc())
+#         episode["generate_content"] = generate_content[0]
+#         episode["before_trans"] = output_text[0]
+#         episode["pred"] = NO_THOUGHT_EXAMPLE
+#     return episode
+def run_episode_high(episode, image_path,history_list,use_low_instruction):
+    #print(msg)
+    #print(episode)
+    try:
+        global _llm,_tokenizer
+        torch.cuda.empty_cache()
+        # msg[0]["content"].append(img)
+        instruction = episode["instruction"]
+        #low_instruction = episode["low_instruction"]
+        history = build_history_actions_str(history_list)
+        text = ("You are a well-trained mobile intelligent agent capable of assisting users with step-by-step navigation tasks. Given the current smartphone screenshot <image> and the user instruction: \n {instruction} \n Action History: \n {history} \n Please output the correct function call to accomplish the user instruction. Besides the function call, you should not output any other content.\nYou can call the following functions to control the smartphone.\n- UI Basic Operations:\n    1. tap(x: float,y: float) This function is used to click on a specific point on the smartphone screen. The coordinates x and y indicate the click position.  \n    2. scroll(x: float, y: float,direction: str) This function is used to swipe from the starting coordinates (x, y) in the specified direction. The coordinates x and y represent the center position of the control to be swiped. The direction can be \"up\", \"down\", \"left\", or \"right\".\n    3. text(x: float,y: float,text_input: str) This function is used to input the specified text at the given coordinates. The coordinates x and y represent the center position of the control to be clicked.\n- Phone Key Operations:\n    4. navigate_back() This function is used to return to the previous screen on the smartphone.\n    5. navigate_home() This function is used to return to the home screen of the phone.\n- Other Operations:\n    6. long_press(x: float,y: float) This function is used to perform a long press action at a specific point on the smartphone screen. The coordinates x and y indicate the long press position.\n    7. wait() This function is to wait at current page.\n    ").format(instruction=instruction, history=history)
+        conversation = [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": text},
+                    {"type": "image", "image": image_path},
+                ],
+            },
+        ]
+        text_prompt = _tokenizer.apply_chat_template(conversation, tokenize=False, add_generation_prompt=True)
+        print(text_prompt)
+        # Excepted output: '<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n<|im_start|>user\n<|vision_start|><|image_pad|><|vision_end|>Describe this image.<|im_end|>\n<|im_start|>assistant\n'
+        image_inputs, video_inputs = process_vision_info(conversation)
+        inputs = _tokenizer(
+            text=[text_prompt],
+            images=image_inputs,
+            videos=video_inputs,
+            padding=True,
+            return_tensors="pt",
+        )
+        device = _llm.device
+        inputs = inputs.to(device)
+
+        # Inference: Generation of the output
+        output_ids = _llm.generate(**inputs, max_new_tokens=128,temperature=0, do_sample=False) # temperature=0.1
+        generated_ids = [
+            output_ids[len(input_ids) :]
+            for input_ids, output_ids in zip(inputs.input_ids, output_ids)
+        ]
+        output_text = _tokenizer.batch_decode(
+            generated_ids, skip_special_tokens=True, clean_up_tokenization_spaces=True
+        )
+        print(output_text[0])
+
+        generate_content = _tokenizer.batch_decode(
+            output_ids, skip_special_tokens=True, clean_up_tokenization_spaces=True
+        )
+        print(generate_content[0])
+
+        episode["generate_content"] = generate_content[0]
+        episode["before_trans"] = output_text[0]
+        episode["pred"] = honor2minicpm(output_text[0])
+        print(episode["pred"])
+    except Exception as e:
+        print(f"Error: {e}")
+        episode["generate_content"] = generate_content[0]
+        episode["before_trans"] = output_text[0]
+        episode["pred"] = NO_THOUGHT_EXAMPLE
+    return episode
+
+def honor2minicpm(action_str):
+    """
+    Convert the ui-tars action string to the minicpm schema format
+    
+    Args:
+        action_str (str): like "click(start_box='<|box_start|>(558,925)<|box_end|>')"
+        
+    Returns:
+        dict: new format action dictionary
+    """
+    result = {"STATUS": "continue"}
+    
+    # auxiliary function to extract coordinates
+    def extract_coords(s):
+        # directly find and extract the coordinates in the parentheses
+        start = s.find("(")
+        end = s.find(")")
+        if start != -1 and end != -1:
+            coords_str = s[start+1:end].strip()  # extract the content in (x,y)
+            x, y = coords_str.split(",")
+            return [int(x), int(y)]
+        raise ValueError(f"Cannot find coordinates in the string: {s}")
+    
+    if "tap(" in action_str:
+        result["POINT"] = extract_coords(action_str)
+        
+    elif "long_press(" in action_str:
+        result["POINT"] = extract_coords(action_str)
+        result["duration"] = 1000
+            
+    elif "text(" in action_str:
+        content = action_str.split(",")[-1][:-1]
+        result["TYPE"] = content
+        
+    elif "scroll(" in action_str:
+        direction = action_str.split(",")[-1][:-1]
+        result["POINT"] = [0, 0]  # screen center point
+        #need reverse direction
+        # if direction == "down":
+        #     direction = "up"
+        # elif direction == "up":
+        #     direction = "down"
+        # elif direction == "right":
+        #     direction = "left"
+        # elif direction == "left":
+        #     direction = "right"
+        result["to"] = direction
+    elif "nagivate_back()" in action_str:
+        result["PRESS"] = "BACK"
+        
+    elif "nagivate_home()" in action_str:
+        result["PRESS"] = "HOME"
+        
+    elif "wait()" in action_str:
+        result["duration"] = 500
+        
+    elif "finish()" in action_str:
+        result["STATUS"] = "finish"
+
+    else:
+        print(f"Error, invalid action: {action_str}")
+    return result
+def run_episode(episode, image_path,history_list,use_low_instruction):
+    if use_low_instruction:
+        return run_episode_low(episode, image_path,history_list,use_low_instruction)
+    else:
+        return run_episode_high(episode, image_path,history_list,use_low_instruction)
+def load_image(episode,image_path,history_list,use_low_instruction):
+    
+    return (episode,image_path,history_list,use_low_instruction)
+def predict(args, datasets):
+    # set global variable
+    global USE_LOW_INSTRUCTION
+    USE_LOW_INSTRUCTION = (args.data_name == 'android_control_low_test')
+    data_dir = args.data_dir
+    split_type = args.split
+    print("Predicting on:",datasets)
+    
+    
+    if multiprocessing.get_start_method(allow_none=True) != "spawn":
+        multiprocessing.set_start_method("spawn", force=True)
+    
+    with ProcessPoolExecutor(max_workers=len(DEVICES),initializer=_init_llm,initargs=(args.model_path,)) as poolexec:
+        tasks = []
+        print("Moving model to devices")
+        for device in DEVICES:
+            tasks.append(poolexec.submit(move_to, device))
+        for t in tasks:
+            print(t.result())
+    
+        for dataset in datasets:
+            save_dir = os.path.join(args.output_dir, dataset)
+            if not os.path.exists(save_dir):
+                os.makedirs(save_dir)
+                
+            episode_dir = os.path.join(data_dir, split_type, dataset)
+
+            # Use predict.jsonl file to store results (write line by line)
+            output_file = os.path.join(save_dir, "predict.jsonl")
+            
+            # Get the list of all episodes files
+            if os.path.exists(episode_dir):
+                episodes_files = os.listdir(episode_dir)
+            else:
+                continue
+            
+            future = []
+            all_tasks = []
+            print("Loading episodes")
+            with ThreadPoolExecutor(max_workers=16) as executor:
+                for episodes_file in episodes_files:
+
+                    episodes_path = os.path.join(episode_dir, episodes_file, f"{episodes_file}.json")
+                    try:
+                        with open(episodes_path, 'r', encoding='utf-8') as f:
+                            episodes = json.load(f)
+                    except Exception as e:
+                        print(f"Failed to load {episodes_path}: {e}")
+                        continue
+                        # Skip this file on error
+                    for index,episode in enumerate(episodes):
+                        episode_history = []  # Create a separate history for each episode
+                        for prev_episode in episodes[:index]:
+                        #for prev_episode in episodes[:episode['step_id']-1]:  # Only get history before current step
+                            image_path = os.path.join(episode_dir, episodes_file, f"{episodes_file}_{prev_episode['step_id']}.jpeg")
+                            if not os.path.exists(image_path):
+                                image_path = image_path.replace(".jpeg", ".png")
+                            if not os.path.exists(image_path):
+                                image_path = prev_episode["image_path"]
+                            histroy_action = {
+                                "result_action_type": prev_episode['result_action_type'],
+                                "result_action_text": prev_episode['result_action_text'],
+                                "result_touch_yx": prev_episode['result_touch_yx'],
+                                "result_lift_yx": prev_episode['result_lift_yx'],
+                                "low_instruction": prev_episode.get("low_instruction",""),
+                                "image_path": image_path,
+                                "result_action_app_name": prev_episode.get('result_action_app_name', ''),
+                            }
+                            episode_history.append(histroy_action)
+                        episode["category"] = dataset
+                        image_path = os.path.join(episode_dir, episodes_file, f"{episodes_file}_{episode['step_id']}.jpeg")
+                        if not os.path.exists(image_path):
+                            image_path = image_path.replace(".jpeg", ".png")
+                        if not os.path.exists(image_path):
+                            image_path = episode["image_path"]
+                        episode_copy = copy.deepcopy(episode)
+                        episode_history_copy = copy.deepcopy(episode_history)
+                        future.append(executor.submit(load_image, episode_copy, image_path, episode_history_copy, USE_LOW_INSTRUCTION))
+
+                for f in as_completed(future):
+                    all_tasks.append(f.result())
+
+            with open(output_file, "w", encoding="utf-8") as f_out:
+                print("Predicting")
+                tasks = []
+                for task_value in all_tasks:
+                    tasks.append(poolexec.submit(run_episode, *task_value))
+                
+                for task in tqdm(as_completed(tasks), total=len(tasks), dynamic_ncols=True):
+                    try:
+                        episode = task.result()
+                        episode_json = json.dumps(episode, ensure_ascii=False)
+                        f_out.write(episode_json + "\n")
+                        f_out.flush()
+                    except Exception as e:
+                        print(f"Error: {e}")
+                        continue
+
+        print(f"Prediction saved at: {output_file}.")
+    os.system(f"cat {args.output_dir}/*/predict.jsonl > {args.output_dir}/all.jsonl")
+    print(f"Merged prediction saved at: {args.output_dir}/all.jsonl.")
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="UI-TARS Inference")
+    parser.add_argument("--seed", type=int, default=2020, help="Random seed")
+    parser.add_argument("--model_path", type=str, default=os.getenv("MODEL_NAME", "/home/test/test03/models/UI-TARS-7B-SFT"),
+                       help="Model path")
+    parser.add_argument("--output_dir", type=str, 
+                       default=os.path.join(os.getenv('OUTPUT_PATH', "eval_results")),
+                       help="Directory to save results")
+    parser.add_argument("--data_name", type=str, default=os.getenv("PREDICT_DATASET", "android_control_low_test"),
+                       help="Eval dataset name")
+    args = parser.parse_args()
+    random.seed(args.seed)
+
+    # Get dataset information
+    args.data_dir, args.split, data_subset = get_dataset_dir(args.data_name)
+    
+    # Update output directory with model name
+    # model_name = args.model_path.split("/")[-2:]  # Get last two parts of model path
+    # args.output_dir = os.path.join(args.output_dir, *model_name, args.data_name)
+    
+    print(f'Loading model at : {args.model_path}')
+    print(f'Loading data at  : {args.data_dir}')
+    print(f'Processing subsets: {data_subset}')
+    print(f'Saving results at: {args.output_dir}')
+    
+    predict(args, data_subset)
