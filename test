@@ -42,29 +42,31 @@ gs://gresearch/android_control/test_subsplits.json
 
 
 import json
+import os
 
+def function(template_path, input_file, outout_file):
+    f = open(template_path).readlines()
 
-file_path = "/opt/nas/n/dongshaokang/AgentCPM-GUI/eval/eval_results/UI-TARS-7B-SFT/gui_odyssey_test/all.jsonl"
+    input_list = []
+    for item in f:
+        item = json.loads(item)
+        input_list.append(item)
 
-f = open(file_path).readlines()
+    compare_list = {}
 
-input_list = []
-for item in f:
-    item = json.loads(item)
-    input_list.append(item)
+    f = open(input_file).readlines()
+    for item in f:
+        item = json.loads(item)
+        compare_list[item["images"][0]["path"]] = item["response"]
 
-compare_list = {}
-
-f = open("/opt/nas/n/dongshaokang/AgentCPM-GUI/eval/eval_data/odyssey_honor_initial_test/CPT630-GRPO/response_odyssey.json").readlines()
-for item in f:
-    item = json.loads(item)
-    compare_list[item["images"][0]["path"]] = item["response"]
-
-output_list = []
-for item in input_list:
-    img = item["image_path"]
-    try:
+    for item in input_list:
+        img = item["image_path"]
         response = compare_list[img]
+
+        if "before_trans" in item:
+            before_trans = item["before_trans"]
+            item["before_trans"] = response
+            item["generate_content"] = item["generate_content"].replace(before_trans, response)
 
         result = {"STATUS": "continue"}
         
@@ -94,27 +96,32 @@ for item in input_list:
             direction = response.split(",")[-1][:-1]
             result["POINT"] = [0, 0]  # screen center point
             result["to"] = direction
-        elif "navigate_back()" in response:
+        elif "navigate_back" in response:
             result["PRESS"] = "BACK"
-            
-        elif "navigate_home()" in response:
-            result["PRESS"] = "HOME"
-            
+
+        elif "navigate_home" in response:
+             result["PRESS"] = "HOME"
+
         elif "wait()" in response:
             result["duration"] = 500
-            
-        elif "finish()" in response:
+    
+        elif "finish()" in response or "Finish()" in response:
             result["STATUS"] = "finish"
 
+        else:
+            print(response)
+
         item["pred"] = result
-        output_list.append(item)
-    except Exception:
-        pass
 
-with open('/opt/nas/n/dongshaokang/AgentCPM-GUI/eval/eval_results/CPT630-Odyssey/gui_odyssey_test_cpt_grpo_nohistory/all.jsonl', 'w', encoding='utf-8') as f:
-    for item in output_list:
-        json_line = json.dumps(item, ensure_ascii=False)
-        f.write(json_line + '\n')
-
-
+    outout_path = "/".join(outout_file.split("/")[:-1])
+    if not os.path.exists(outout_path):
+        os.makedirs(outout_path)
     
+    with open(outout_file, 'w', encoding='utf-8') as f:
+        for item in input_list:
+            json_line = json.dumps(item, ensure_ascii=False)
+            f.write(json_line + '\n')
+
+function(template_path="/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_results/V1/CPT630/android_control_low_test_v1/all_copy2.jsonl",
+         input_file="/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/CPT729/infer_full_hl/response_ac_hl_nothink.json", 
+         outout_file='/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_results/V2-Finish-Test/CPT729/ac_low/all.jsonl')
