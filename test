@@ -11,3 +11,6 @@ gsutil version
 gsutil ls gs://gresearch/android_control/
 
 gsutil -m cp -r gs://gresearch/android_control/ ./android_control/
+
+(torch_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3# gsutil -m cp -r gs://gresearch/android_control/ ./android_control/
+(torch_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3# 
