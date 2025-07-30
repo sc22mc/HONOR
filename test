@@ -41,47 +41,34 @@ gs://gresearch/android_control/test_subsplits.json
 (torch_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3# gsutil -m cp gs://gresearch/android_control/* ./android_control/
 
 
-处理
 import tensorflow as tf
 import json
 
-# 1. 读取测试集 ID
+# 读取 test ID 列表
 with open("android_control/splits.json", "r") as f:
     splits = json.load(f)
 
-test_ids = set(map(int, splits["test"]))  # 转换成整数集合
+test_ids = set(map(int, splits["test"]))
 
-# 2. 遍历 TFRecord 所有文件
 def parse_tfrecord(record):
     example = tf.train.Example()
     example.ParseFromString(record.numpy())
     return example
 
-all_records = []
 sample_idx = 0
+test_examples = []
 
 for i in range(20):
     path = f"android_control/android_control-{i:05d}-of-00020"
-    raw_dataset = tf.data.TFRecordDataset(path)
+    print(f"Loading {path} ...")
+
+    # ✅ 注意 compression_type="GZIP"
+    raw_dataset = tf.data.TFRecordDataset(path, compression_type="GZIP")
 
     for raw_record in raw_dataset:
         if sample_idx in test_ids:
             example = parse_tfrecord(raw_record)
-            all_records.append(example)
+            test_examples.append(example)
         sample_idx += 1
 
-print(f"Loaded {len(all_records)} test examples.")
-
-Traceback (most recent call last):
-  File "/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/ac.py", line 23, in <module>
-    for raw_record in raw_dataset:
-  File "/opt/nas/p/conda/envs/torch_cmx/lib/python3.10/site-packages/tensorflow/python/data/ops/iterator_ops.py", line 826, in __next__
-    return self._next_internal()
-  File "/opt/nas/p/conda/envs/torch_cmx/lib/python3.10/site-packages/tensorflow/python/data/ops/iterator_ops.py", line 776, in _next_internal
-    ret = gen_dataset_ops.iterator_get_next(
-  File "/opt/nas/p/conda/envs/torch_cmx/lib/python3.10/site-packages/tensorflow/python/ops/gen_dataset_ops.py", line 3086, in iterator_get_next
-    _ops.raise_from_not_ok_status(e, name)
-  File "/opt/nas/p/conda/envs/torch_cmx/lib/python3.10/site-packages/tensorflow/python/framework/ops.py", line 6006, in raise_from_not_ok_status
-    raise core._status_to_exception(e) from None  # pylint: disable=protected-access
-tensorflow.python.framework.errors_impl.DataLossError: {{function_node __wrapped__IteratorGetNext_output_types_1_device_/job:localhost/replica:0/task:0/device:CPU:0}} corrupted record at 0 (Is this even a TFRecord file?) [Op:IteratorGetNext] name: 
-(torch_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3# 
+print(f"✅ Loaded {len(test_examples)} test samples.")
