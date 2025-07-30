@@ -38,5 +38,53 @@ gs://gresearch/android_control/splits.json
 gs://gresearch/android_control/test_subsplits.json
 
 
-gsutil -m cp gs://gresearch/android_control/* ./android_control/
+(torch_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3# gsutil -m cp gs://gresearch/android_control/* ./android_control/
+CommandException: Destination URL must name a directory, bucket, or bucket
+subdirectory for the multiple source form of the cp command.
+CommandException: Destination URL must name a directory, bucket, or bucket
+subdirectory for the multiple source form of the cp command.
+CommandException: Destination URL must name a directory, bucket, or bucket
+subdirectory for the multiple source form of the cp command.
+CommandException: Destination URL must name a directory, bucket, or bucket
+subdirectory for the multiple source form of the cp command.
+CommandException: Destination URL must name a directory, bucket, or bucket
+subdirectory for the multiple source form of the cp command.
+CommandException: Destination URL must name a directory, bucket, or bucket
+subdirectory for the multiple source form of the cp command.
+CommandException: Destination URL must name a directory, bucket, or bucket
+subdirectory for the multiple source form of the cp command.
+CommandException: Destination URL must name a directory, bucket, or bucket
+subdirectory for the multiple source form of the cp command.
+CommandException: Destination URL must name a directory, bucket, or bucket
+subdirectory for the multiple source form of the cp command.
+CommandException: Destination URL must name a directory, bucket, or bucket
+subdirectory for the multiple source form of the cp command.
+CommandException: Destination URL must name a directory, bucket, or bucket
+subdirectory for the multiple source form of the cp command.
+CommandException: Destination URL must name a directory, bucket, or bucket
+subdirectory for the multiple source form of the cp command.
+CommandException: Destination URL must name a directory, bucket, or bucket
+subdirectory for the multiple source form of the cp command.
+CommandException: Destination URL must name a directory, bucket, or bucket
+subdirectory for the multiple source form of the cp command.
+CommandException: Destination URL must name a directory, bucket, or bucket
+subdirectory for the multiple source form of the cp command.
+CommandException: Destination URL must name a directory, bucket, or bucket
+subdirectory for the multiple source form of the cp command.
+CommandException: Destination URL must name a directory, bucket, or bucket
+subdirectory for the multiple source form of the cp command.
+CommandException: Destination URL must name a directory, bucket, or bucket
+subdirectory for the multiple source form of the cp command.
+CommandException: Destination URL must name a directory, bucket, or bucket
+subdirectory for the multiple source form of the cp command.
+CommandException: Destination URL must name a directory, bucket, or bucket
+subdirectory for the multiple source form of the cp command.
+CommandException: Destination URL must name a directory, bucket, or bucket
+subdirectory for the multiple source form of the cp command.
+CommandException: Destination URL must name a directory, bucket, or bucket
+subdirectory for the multiple source form of the cp command.
+CommandException: Destination URL must name a directory, bucket, or bucket
+subdirectory for the multiple source form of the cp command.
+CommandException: 23 files/objects could not be transferred.
+(torch_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3# 
 
