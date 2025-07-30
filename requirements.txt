@@ -1,77 +1,82 @@
-absl-py==2.3.1
-android-env==1.2.3
-asttokens @ file:///home/conda/feedstock_root/build_artifacts/asttokens_1733250440834/work
-astunparse==1.6.3
-attrs==25.3.0
-certifi==2025.7.14
-charset-normalizer==3.4.2
-comm @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_comm_1753453984/work
-debugpy @ file:///croot/debugpy_1736267418885/work
-decorator @ file:///home/conda/feedstock_root/build_artifacts/decorator_1740384970518/work
-dm-env==1.6
-dm-tree==0.1.9
-exceptiongroup @ file:///home/conda/feedstock_root/build_artifacts/exceptiongroup_1746947292760/work
-executing @ file:///home/conda/feedstock_root/build_artifacts/executing_1745502089858/work
-filelock==3.18.0
-flatbuffers==25.2.10
-fsspec==2025.7.0
-gast==0.6.0
-google-pasta==0.2.0
-grpcio==1.74.0
-h5py==3.14.0
-hf-xet==1.1.5
-huggingface-hub==0.34.3
-idna==3.10
-importlib_metadata @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_importlib-metadata_1747934053/work
-ipykernel @ file:///home/conda/feedstock_root/build_artifacts/ipykernel_1753749834440/work
-ipython @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_ipython_1748711175/work
-jedi @ file:///home/conda/feedstock_root/build_artifacts/jedi_1733300866624/work
-jupyter_client @ file:///home/conda/feedstock_root/build_artifacts/jupyter_client_1733440914442/work
-jupyter_core @ file:///home/conda/feedstock_root/build_artifacts/jupyter_core_1748333051527/work
-keras==3.11.0
-libclang==18.1.1
-Markdown==3.8.2
-markdown-it-py==3.0.0
-MarkupSafe==3.0.2
-matplotlib-inline @ file:///home/conda/feedstock_root/build_artifacts/matplotlib-inline_1733416936468/work
-mdurl==0.1.2
-ml_dtypes==0.5.3
-namex==0.1.0
-nest_asyncio @ file:///home/conda/feedstock_root/build_artifacts/nest-asyncio_1733325553580/work
-numpy==2.1.3
-opt_einsum==3.4.0
-optree==0.17.0
-packaging @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_packaging_1745345660/work
-parso @ file:///home/conda/feedstock_root/build_artifacts/parso_1733271261340/work
-pexpect @ file:///home/conda/feedstock_root/build_artifacts/pexpect_1733301927746/work
-pickleshare @ file:///home/conda/feedstock_root/build_artifacts/pickleshare_1733327343728/work
-platformdirs @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_platformdirs_1746710438/work
-portpicker==1.6.0
-prompt_toolkit @ file:///home/conda/feedstock_root/build_artifacts/prompt-toolkit_1744724089886/work
-protobuf==5.29.5
-psutil @ file:///home/conda/feedstock_root/build_artifacts/psutil_1653089181607/work
-ptyprocess @ file:///home/conda/feedstock_root/build_artifacts/ptyprocess_1733302279685/work/dist/ptyprocess-0.7.0-py2.py3-none-any.whl#sha256=92c32ff62b5fd8cf325bec5ab90d7be3d2a8ca8c8a3813ff487a8d2002630d1f
-pure_eval @ file:///home/conda/feedstock_root/build_artifacts/pure_eval_1733569405015/work
-pygame==2.6.1
-Pygments @ file:///home/conda/feedstock_root/build_artifacts/pygments_1750615794071/work
-python-dateutil @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_python-dateutil_1751104122/work
-PyYAML==6.0.2
-pyzmq @ file:///croot/pyzmq_1734687138743/work
-requests==2.32.4
-rich==14.1.0
-six @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_six_1753199211/work
-stack_data @ file:///home/conda/feedstock_root/build_artifacts/stack_data_1733569443808/work
-tensorboard==2.19.0
-tensorboard-data-server==0.7.2
-tensorflow==2.19.0
-tensorflow-io-gcs-filesystem==0.37.1
-termcolor==3.1.0
-tornado @ file:///croot/tornado_1748956929273/work
-tqdm==4.67.1
-traitlets @ file:///home/conda/feedstock_root/build_artifacts/traitlets_1733367359838/work
-typing_extensions @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_typing_extensions_1751643513/work
-urllib3==2.5.0
-wcwidth @ file:///home/conda/feedstock_root/build_artifacts/wcwidth_1733231326287/work
-Werkzeug==3.1.3
-wrapt==1.17.2
-zipp @ file:///home/conda/feedstock_root/build_artifacts/zipp_1749421620841/work
+# %%
+import os
+import json
+import shutil
+from tqdm import tqdm
+
+# %%
+# 当前路径（适配 notebook）
+current_dir = os.getcwd()
+
+# 源数据所在路径
+dataset_dir = os.path.join(current_dir, 'android_control_test', 'test', 'android_control')
+
+# %%
+# 收集 low-level 和 high-level 指令数据
+low_level_data = []
+high_level_data = []
+sample_id = 0
+
+for folder_name in tqdm(sorted(os.listdir(dataset_dir))):
+    json_file_path = os.path.join(dataset_dir, folder_name, f"{folder_name}.json")
+    with open(json_file_path, 'r') as f:
+        sample_list = json.load(f)
+
+    for sample in sample_list:
+        image_path = sample['image_path']
+        low_level_data.append({
+            "id": sample_id,
+            "query": sample['low_instruction'],
+            "images": [image_path]
+        })
+        high_level_data.append({
+            "id": sample_id,
+            "query": sample['instruction'],
+            "action_type": sample['result_action_type']
+        })
+        sample_id += 1
+
+# %%
+# 预览 low-level 样本格式
+print(low_level_data[:2])
+
+# %%
+def process_samples(data_list, output_root_dir, dataset_name):
+    print(f"▶ 正在处理：{dataset_name}")
+
+    target_dir = os.path.join(output_root_dir, dataset_name)
+    images_dir = os.path.join(target_dir, "images")
+    os.makedirs(images_dir, exist_ok=True)
+
+    output_jsonl_path = os.path.join(target_dir, f"{dataset_name}.jsonl")
+
+    with open(output_jsonl_path, 'w', encoding='utf-8') as f:
+        for item in data_list:
+            image_filenames = [os.path.basename(p) for p in item['images']]
+            new_item = {
+                "id": item["id"],
+                "query": item["query"],
+                "images": image_filenames
+            }
+            f.write(json.dumps(new_item, ensure_ascii=False) + '\n')
+
+            # 拷贝图片到目标 images 目录
+            for original_image_path in item['images']:
+                dst_path = os.path.join(images_dir, os.path.basename(original_image_path))
+                shutil.copy2(original_image_path, dst_path)
+
+    print(f"✅ 已保存：{output_jsonl_path}")
+    print(f"🖼️  图片复制完成：{images_dir}")
+
+# %%
+# 输出到当前目录的上一级
+output_base_dir = os.path.dirname(current_dir)
+
+# 批量处理两个数据集
+datasets = {
+    "AC-Low": low_level_data,
+    "AC-High": high_level_data
+}
+
+for dataset_name, dataset_content in datasets.items():
+    process_samples(dataset_content, output_base_dir, dataset_name)
