@@ -1,82 +1,11 @@
-# %%
-import os
-import json
-import shutil
-from tqdm import tqdm
-
-# %%
-# 当前路径（适配 notebook）
-current_dir = os.getcwd()
-
-# 源数据所在路径
-dataset_dir = os.path.join(current_dir, 'android_control_test', 'test', 'android_control')
-
-# %%
-# 收集 low-level 和 high-level 指令数据
-low_level_data = []
-high_level_data = []
-sample_id = 0
-
-for folder_name in tqdm(sorted(os.listdir(dataset_dir))):
-    json_file_path = os.path.join(dataset_dir, folder_name, f"{folder_name}.json")
-    with open(json_file_path, 'r') as f:
-        sample_list = json.load(f)
-
-    for sample in sample_list:
-        image_path = sample['image_path']
-        low_level_data.append({
-            "id": sample_id,
-            "query": sample['low_instruction'],
-            "images": [image_path]
-        })
-        high_level_data.append({
-            "id": sample_id,
-            "query": sample['instruction'],
-            "action_type": sample['result_action_type']
-        })
-        sample_id += 1
-
-# %%
-# 预览 low-level 样本格式
-print(low_level_data[:2])
-
-# %%
-def process_samples(data_list, output_root_dir, dataset_name):
-    print(f"▶ 正在处理：{dataset_name}")
-
-    target_dir = os.path.join(output_root_dir, dataset_name)
-    images_dir = os.path.join(target_dir, "images")
-    os.makedirs(images_dir, exist_ok=True)
-
-    output_jsonl_path = os.path.join(target_dir, f"{dataset_name}.jsonl")
-
-    with open(output_jsonl_path, 'w', encoding='utf-8') as f:
-        for item in data_list:
-            image_filenames = [os.path.basename(p) for p in item['images']]
-            new_item = {
-                "id": item["id"],
-                "query": item["query"],
-                "images": image_filenames
-            }
-            f.write(json.dumps(new_item, ensure_ascii=False) + '\n')
-
-            # 拷贝图片到目标 images 目录
-            for original_image_path in item['images']:
-                dst_path = os.path.join(images_dir, os.path.basename(original_image_path))
-                shutil.copy2(original_image_path, dst_path)
-
-    print(f"✅ 已保存：{output_jsonl_path}")
-    print(f"🖼️  图片复制完成：{images_dir}")
-
-# %%
-# 输出到当前目录的上一级
-output_base_dir = os.path.dirname(current_dir)
-
-# 批量处理两个数据集
-datasets = {
-    "AC-Low": low_level_data,
-    "AC-High": high_level_data
-}
-
-for dataset_name, dataset_content in datasets.items():
+[{'id': 0, 'query': 'open the Nike app', 'images': ['/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/datasets/eval_data/tmp/android_control/screenshots/10026/screenshot_10026_1.png']}, {'id': 1, 'query': 'click on the search icon', 'images': ['/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/datasets/eval_data/tmp/android_control/screenshots/10026/screenshot_10026_2.png']}]
+▶ 正在处理：AC-Low
+✅ 已保存：/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/datasets/AC-Low/AC-Low.jsonl
+🖼️  图片复制完成：/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/datasets/AC-Low/images
+▶ 正在处理：AC-High
+Traceback (most recent call last):
+  File "/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/datasets/eval_data/process_ac2.py", line 80, in <module>
     process_samples(dataset_content, output_base_dir, dataset_name)
+  File "/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/datasets/eval_data/process_ac2.py", line 53, in process_samples
+    image_filenames = [os.path.basename(p) for p in item['images']]
+KeyError: 'images'
