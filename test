@@ -12,5 +12,28 @@ gsutil ls gs://gresearch/android_control/
 
 gsutil -m cp -r gs://gresearch/android_control/ ./android_control/
 
-(torch_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3# gsutil -m cp -r gs://gresearch/android_control/ ./android_control/
+(torch_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3# gsutil ls gs://gresearch/android_control/
+gs://gresearch/android_control/
+gs://gresearch/android_control/android_control-00000-of-00020
+gs://gresearch/android_control/android_control-00001-of-00020
+gs://gresearch/android_control/android_control-00002-of-00020
+gs://gresearch/android_control/android_control-00003-of-00020
+gs://gresearch/android_control/android_control-00004-of-00020
+gs://gresearch/android_control/android_control-00005-of-00020
+gs://gresearch/android_control/android_control-00006-of-00020
+gs://gresearch/android_control/android_control-00007-of-00020
+gs://gresearch/android_control/android_control-00008-of-00020
+gs://gresearch/android_control/android_control-00009-of-00020
+gs://gresearch/android_control/android_control-00010-of-00020
+gs://gresearch/android_control/android_control-00011-of-00020
+gs://gresearch/android_control/android_control-00012-of-00020
+gs://gresearch/android_control/android_control-00013-of-00020
+gs://gresearch/android_control/android_control-00014-of-00020
+gs://gresearch/android_control/android_control-00015-of-00020
+gs://gresearch/android_control/android_control-00016-of-00020
+gs://gresearch/android_control/android_control-00017-of-00020
+gs://gresearch/android_control/android_control-00018-of-00020
+gs://gresearch/android_control/android_control-00019-of-00020
+gs://gresearch/android_control/splits.json
+gs://gresearch/android_control/test_subsplits.json
 (torch_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3# 
