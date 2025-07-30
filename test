@@ -41,34 +41,80 @@ gs://gresearch/android_control/test_subsplits.json
 (torch_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3# gsutil -m cp gs://gresearch/android_control/* ./android_control/
 
 
-import tensorflow as tf
 import json
 
-# 读取 test ID 列表
-with open("android_control/splits.json", "r") as f:
-    splits = json.load(f)
 
-test_ids = set(map(int, splits["test"]))
+file_path = "/opt/nas/n/dongshaokang/AgentCPM-GUI/eval/eval_results/UI-TARS-7B-SFT/gui_odyssey_test/all.jsonl"
 
-def parse_tfrecord(record):
-    example = tf.train.Example()
-    example.ParseFromString(record.numpy())
-    return example
+f = open(file_path).readlines()
 
-sample_idx = 0
-test_examples = []
+input_list = []
+for item in f:
+    item = json.loads(item)
+    input_list.append(item)
 
-for i in range(20):
-    path = f"android_control/android_control-{i:05d}-of-00020"
-    print(f"Loading {path} ...")
+compare_list = {}
 
-    # ✅ 注意 compression_type="GZIP"
-    raw_dataset = tf.data.TFRecordDataset(path, compression_type="GZIP")
+f = open("/opt/nas/n/dongshaokang/AgentCPM-GUI/eval/eval_data/odyssey_honor_initial_test/CPT630-GRPO/response_odyssey.json").readlines()
+for item in f:
+    item = json.loads(item)
+    compare_list[item["images"][0]["path"]] = item["response"]
 
-    for raw_record in raw_dataset:
-        if sample_idx in test_ids:
-            example = parse_tfrecord(raw_record)
-            test_examples.append(example)
-        sample_idx += 1
+output_list = []
+for item in input_list:
+    img = item["image_path"]
+    try:
+        response = compare_list[img]
 
-print(f"✅ Loaded {len(test_examples)} test samples.")
+        result = {"STATUS": "continue"}
+        
+        # auxiliary function to extract coordinates
+        def extract_coords(s):
+            # directly find and extract the coordinates in the parentheses
+            start = s.find("(")
+            end = s.find(")")
+            if start != -1 and end != -1:
+                coords_str = s[start+1:end].strip()  # extract the content in (x,y)
+                x, y = coords_str.split(",")
+                return [int(x), int(y)]
+            raise ValueError(f"Cannot find coordinates in the string: {s}")
+        
+        if "tap(" in response:
+            result["POINT"] = extract_coords(response)
+            
+        elif "long_press(" in response:
+            result["POINT"] = extract_coords(response)
+            result["duration"] = 1000
+                
+        elif "text(" in response:
+            content = response.split(",")[-1][:-1]
+            result["TYPE"] = content
+            
+        elif "scroll(" in response:
+            direction = response.split(",")[-1][:-1]
+            result["POINT"] = [0, 0]  # screen center point
+            result["to"] = direction
+        elif "navigate_back()" in response:
+            result["PRESS"] = "BACK"
+            
+        elif "navigate_home()" in response:
+            result["PRESS"] = "HOME"
+            
+        elif "wait()" in response:
+            result["duration"] = 500
+            
+        elif "finish()" in response:
+            result["STATUS"] = "finish"
+
+        item["pred"] = result
+        output_list.append(item)
+    except Exception:
+        pass
+
+with open('/opt/nas/n/dongshaokang/AgentCPM-GUI/eval/eval_results/CPT630-Odyssey/gui_odyssey_test_cpt_grpo_nohistory/all.jsonl', 'w', encoding='utf-8') as f:
+    for item in output_list:
+        json_line = json.dumps(item, ensure_ascii=False)
+        f.write(json_line + '\n')
+
+
+    
