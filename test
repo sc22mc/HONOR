@@ -36,4 +36,7 @@ gs://gresearch/android_control/android_control-00018-of-00020
 gs://gresearch/android_control/android_control-00019-of-00020
 gs://gresearch/android_control/splits.json
 gs://gresearch/android_control/test_subsplits.json
-(torch_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3# 
+
+
+gsutil -m cp gs://gresearch/android_control/* ./android_control/
+
