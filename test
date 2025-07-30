@@ -37,54 +37,39 @@ gs://gresearch/android_control/android_control-00019-of-00020
 gs://gresearch/android_control/splits.json
 gs://gresearch/android_control/test_subsplits.json
 
-
+创建一个目录
 (torch_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3# gsutil -m cp gs://gresearch/android_control/* ./android_control/
-CommandException: Destination URL must name a directory, bucket, or bucket
-subdirectory for the multiple source form of the cp command.
-CommandException: Destination URL must name a directory, bucket, or bucket
-subdirectory for the multiple source form of the cp command.
-CommandException: Destination URL must name a directory, bucket, or bucket
-subdirectory for the multiple source form of the cp command.
-CommandException: Destination URL must name a directory, bucket, or bucket
-subdirectory for the multiple source form of the cp command.
-CommandException: Destination URL must name a directory, bucket, or bucket
-subdirectory for the multiple source form of the cp command.
-CommandException: Destination URL must name a directory, bucket, or bucket
-subdirectory for the multiple source form of the cp command.
-CommandException: Destination URL must name a directory, bucket, or bucket
-subdirectory for the multiple source form of the cp command.
-CommandException: Destination URL must name a directory, bucket, or bucket
-subdirectory for the multiple source form of the cp command.
-CommandException: Destination URL must name a directory, bucket, or bucket
-subdirectory for the multiple source form of the cp command.
-CommandException: Destination URL must name a directory, bucket, or bucket
-subdirectory for the multiple source form of the cp command.
-CommandException: Destination URL must name a directory, bucket, or bucket
-subdirectory for the multiple source form of the cp command.
-CommandException: Destination URL must name a directory, bucket, or bucket
-subdirectory for the multiple source form of the cp command.
-CommandException: Destination URL must name a directory, bucket, or bucket
-subdirectory for the multiple source form of the cp command.
-CommandException: Destination URL must name a directory, bucket, or bucket
-subdirectory for the multiple source form of the cp command.
-CommandException: Destination URL must name a directory, bucket, or bucket
-subdirectory for the multiple source form of the cp command.
-CommandException: Destination URL must name a directory, bucket, or bucket
-subdirectory for the multiple source form of the cp command.
-CommandException: Destination URL must name a directory, bucket, or bucket
-subdirectory for the multiple source form of the cp command.
-CommandException: Destination URL must name a directory, bucket, or bucket
-subdirectory for the multiple source form of the cp command.
-CommandException: Destination URL must name a directory, bucket, or bucket
-subdirectory for the multiple source form of the cp command.
-CommandException: Destination URL must name a directory, bucket, or bucket
-subdirectory for the multiple source form of the cp command.
-CommandException: Destination URL must name a directory, bucket, or bucket
-subdirectory for the multiple source form of the cp command.
-CommandException: Destination URL must name a directory, bucket, or bucket
-subdirectory for the multiple source form of the cp command.
-CommandException: Destination URL must name a directory, bucket, or bucket
-subdirectory for the multiple source form of the cp command.
-CommandException: 23 files/objects could not be transferred.
-(torch_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3# 
+
+
+处理
+import tensorflow as tf
+import json
+
+# 1. 读取测试集 ID
+with open("android_control/splits.json", "r") as f:
+    splits = json.load(f)
+
+test_ids = set(map(int, splits["test"]))  # 转换成整数集合
+
+# 2. 遍历 TFRecord 所有文件
+def parse_tfrecord(record):
+    example = tf.train.Example()
+    example.ParseFromString(record.numpy())
+    return example
+
+all_records = []
+sample_idx = 0
+
+for i in range(20):
+    path = f"android_control/android_control-{i:05d}-of-00020"
+    raw_dataset = tf.data.TFRecordDataset(path)
+
+    for raw_record in raw_dataset:
+        if sample_idx in test_ids:
+            example = parse_tfrecord(raw_record)
+            all_records.append(example)
+        sample_idx += 1
+
+print(f"Loaded {len(all_records)} test examples.")
+
 
