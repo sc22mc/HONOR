@@ -131,10 +131,13 @@ function(template_path="/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_results/V
          outout_file='/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_results/V2-Finish-Test/CPT729/ac_low/all.jsonl')
 
 
-FileNotFoundError: [Errno 2] No such file or directory: '/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/utils/eval/AC-Low_template.jsonl'
-The program finished and will be restarted
-> /opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/run_eval.py(1)<module>()
--> import torch
-(Pdb) q
-(torch_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3# /opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/utils/eval/AC_Low_template.jsonl
+{"images": [{"path": "screenshot_10026_1.png']"}], "response": "wait()"}
+{"images": [{"path": "screenshot_10026_2.png']"}], "response": "tap(824,86)"}
+{"images": [{"path": "screenshot_10026_3.png']"}], "response": "wait()"}
+{"images": [{"path": "screenshot_10026_4.png']"}], "response": "tap(577,87)"}
+{"images": [{"path": "screenshot_10026_5.png']"}], "response": "text(290,94,running shoes)"}
+{"images": [{"path": "screenshot_10026_6.png']"}], "response": "tap(920,899)"}
+{"images": [{"path": "screenshot_10026_7.png']"}], "response": "finish"}
+{"images": [{"path": "screenshot_10033_1.png']"}], "response": "tap(250,235)"}
+{"images": [{"path": "screenshot_10033_2.png']"}], "response": "finish()"}
 
