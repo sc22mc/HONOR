@@ -131,35 +131,10 @@ function(template_path="/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_results/V
          outout_file='/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_results/V2-Finish-Test/CPT729/ac_low/all.jsonl')
 
 
-import os
-import json
-import pandas as pd
-
-def convert_xlsx_to_jsonl(xlsx_file):
-    # 读取 Excel 文件
-    df = pd.read_excel(xlsx_file)
-
-    # 检查是否包含所需列
-    if not {"images", "prediction"}.issubset(df.columns):
-        raise ValueError("Excel 文件中必须包含 'images' 和 'prediction' 两列")
-
-    # 构造输出路径
-    jsonl_file = os.path.splitext(xlsx_file)[0] + ".jsonl"
-
-    # 写入 JSONL 文件
-    with open(jsonl_file, "w", encoding="utf-8") as f:
-        for _, row in df.iterrows():
-            image_path = row["images"]
-            image_name = os.path.basename(image_path)
-
-            item = {
-                "images": [{"path": image_name}],
-                "response": row["prediction"]
-            }
-
-            json_line = json.dumps(item, ensure_ascii=False)
-            f.write(json_line + "\n")
-
-    print(f"转换完成，保存到：{jsonl_file}")
-
+FileNotFoundError: [Errno 2] No such file or directory: '/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/utils/eval/AC-Low_template.jsonl'
+The program finished and will be restarted
+> /opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/run_eval.py(1)<module>()
+-> import torch
+(Pdb) q
+(torch_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3# /opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/utils/eval/AC_Low_template.jsonl
 
