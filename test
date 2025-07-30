@@ -131,30 +131,24 @@ function(template_path="/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_results/V
          outout_file='/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_results/V2-Finish-Test/CPT729/ac_low/all.jsonl')
 
 
-import os
-import json
-import pandas as pd
+Traceback (most recent call last):
+  File "/opt/nas/p/conda/envs/process_data_cmx/lib/python3.10/site-packages/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 3.19M/3.19M [00:04<00:00, 751kB/s]
+  File "/opt/nas/p/conda/envs/process_data_cmx/lib/python3.10/site-packages/urllib3/connection.py", line 565, in getresponse 
+    httplib_response = super().getresponse()
+  File "/opt/nas/p/conda/envs/process_data_cmx/lib/python3.10/http/client.py", line 1375, in getresponse
+    response.begin()
+  File "/opt/nas/p/conda/envs/process_data_cmx/lib/python3.10/http/client.py", line 318, in begin
+    version, status, reason = self._read_status()
+  File "/opt/nas/p/conda/envs/process_data_cmx/lib/python3.10/http/client.py", line 279, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+  File "/opt/nas/p/conda/envs/process_data_cmx/lib/python3.10/socket.py", line 717, in readinto
+    return self._sock.recv_into(b)
+  File "/opt/nas/p/conda/envs/process_data_cmx/lib/python3.10/ssl.py", line 1307, in recv_into
+    return self.read(nbytes, buffer)
+  File "/opt/nas/p/conda/envs/process_data_cmx/lib/python3.10/ssl.py", line 1163, in read
+    return self._sslobj.read(len, buffer)
+TimeoutError: The read operation timed out
 
-def convert_xlsx_to_jsonl(xlsx_file):
-    # 读取 Excel 文件
-    df = pd.read_excel(xlsx_file)
-
-    # 检查所需字段是否存在
-    if not {"images", "prediction"}.issubset(df.columns):
-        raise ValueError("Excel 文件中必须包含 'images' 和 'prediction' 两列")
-
-    # 构造输出路径：将 .xlsx 替换为 .jsonl
-    jsonl_file = os.path.splitext(xlsx_file)[0] + ".jsonl"
-
-    # 打开文件写入
-    with open(jsonl_file, "w", encoding="utf-8") as f:
-        for _, row in df.iterrows():
-            item = {
-                "images": row["images"],
-                "response": row["prediction"]
-            }
-            json_line = json.dumps(item, ensure_ascii=False)
-            f.write(json_line + "\n")
-
-    print(f"转换完成，保存到：{jsonl_file}")
+The above exception was the direct cause of the following exception:
 
