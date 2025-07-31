@@ -65,42 +65,13 @@ gs://gresearch/android_control/test_subsplits.json
 
 
 
-futures = []
-    for task_args in tqdm(tasks):
-        r = process_step(task_args)
-        futures.append(r)
-    for future in tqdm(as_completed(futures), total=len(futures), desc="Processing steps"):
-        result = future.result()
-        print(result)运行到第二个for循环时又出现[2025-07-31 16:24:24,921] ERROR - RUN - run_eval.py: main - 137: Model RFT x Dataset AC-Low combination failed: 'str' object has no attribute '_condition', skipping this combination.
-Traceback (most recent call last):
-  File "/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/run_eval.py", line 125, in main
-    evaluate(final_result_args)
-  File "/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/utils/eval/run_eval_agent_honor.py", line 150, in evaluate
-    convert2aitz(input_abs_path, output_abs_dir, max_workers=16)
-  File "/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/utils/eval/utils/convert_output.py", line 134, in convert2aitz
-    for future in tqdm(as_completed(futures), total=len(futures), desc="Processing steps"):
-  File "/opt/nas/p/conda/envs/torch_cmx/lib/python3.10/site-packages/tqdm/std.py", line 1181, in __iter__
-    for obj in iterable:
-  File "/opt/nas/p/conda/envs/torch_cmx/lib/python3.10/concurrent/futures/_base.py", line 224, in as_completed
-    with _AcquireFutures(fs):
-  File "/opt/nas/p/conda/envs/torch_cmx/lib/python3.10/concurrent/futures/_base.py", line 151, in __enter__
-    future._condition.acquire()
-AttributeError: 'str' object has no attribute '_condition'
-[2025-07-31 16:24:24] ERROR - run_eval.py: main - 137: Model RFT x Dataset AC-Low combination failed: 'str' object has no attribute '_condition', skipping this combination.
-Traceback (most recent call last):
-  File "/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/run_eval.py", line 125, in main
-    evaluate(final_result_args)
-  File "/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/utils/eval/run_eval_agent_honor.py", line 150, in evaluate
-    convert2aitz(input_abs_path, output_abs_dir, max_workers=16)
-  File "/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/utils/eval/utils/convert_output.py", line 134, in convert2aitz
-    for future in tqdm(as_completed(futures), total=len(futures), desc="Processing steps"):
-  File "/opt/nas/p/conda/envs/torch_cmx/lib/python3.10/site-packages/tqdm/std.py", line 1181, in __iter__
-    for obj in iterable:
-  File "/opt/nas/p/conda/envs/torch_cmx/lib/python3.10/concurrent/futures/_base.py", line 224, in as_completed
-    with _AcquireFutures(fs):
-  File "/opt/nas/p/conda/envs/torch_cmx/lib/python3.10/concurrent/futures/_base.py", line 151, in __enter__
-    future._condition.acquire()
-AttributeError: 'str' object has no attribute '_condition'
-The program finished and will be restarted
-> /opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/run_eval.py(1)<module>()
--> import torch
+{
+    "query": "You are a well-trained mobile intelligent agent capable of assisting users with step-by-step navigation tasks. Given the current smartphone screenshot <image> and the user instruction:\nInstruction: \"finish the task\"\nAction History: \"Click on the search icon. \nEnter Newark in the text box. \nClick on the suggestion. \n\"\n\nPlease output the correct function call to accomplish the user instruction. Besides the function call, you should not output any other content.\nYou can call the following functions to control the smartphone.\n- UI Basic Operations:\n    1. tap(x: float,y: float) This function is used to click on a specific point on the smartphone screen. The coordinates x and y indicate the click position.  \n    2. scroll(x: float, y: float,direction: str) This function is used to swipe from the starting coordinates (x, y) in the specified direction. The coordinates x and y represent the center position of the control to be swiped. The direction can be \"up\", \"down\", \"left\", or \"right\".\n    3. text(x: float,y: float,text_input: str) This function is used to input the specified text at the given coordinates. The coordinates x and y represent the center position of the control to be clicked.\n- Phone Key Operations:\n    4. navigate_back() This function is used to return to the previous screen on the smartphone.\n    5. navigate_home() This function is used to return to the home screen of the phone.\n- Other Operations:\n    6. long_press(x: float,y: float) This function is used to perform a long press action at a specific point on the smartphone screen. The coordinates x and y indicate the long press position.\n    7. wait() This function is to wait at current page.\n    ",
+    "response": "finish()",
+    "history": [],
+    "images": [
+        "/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/tmp/android_control/screenshots/18310/screenshot_18310_3.png"
+    ],
+    "image_width": 1080,
+    "image_height": 2400
+},
