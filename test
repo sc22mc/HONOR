@@ -58,12 +58,30 @@ gs://gresearch/android_control/test_subsplits.json
 
 
 
-except Exception as e:
-        print('Error, JSON is NOT valid according to the schema.')
-        print(f"{e.message}")
-        print(f"{list(e.path)}")
-        print(f"{list(e.schema_path)}")输出
-Error, JSON is NOT valid according to the schema.
-{'STATUS': 'continue'} is not valid under any of the given schemas
-[]
-['allOf', 1, 'then', 'anyOf']
+"allOf": [
+    {
+      "if": {
+        "required": ["to"]
+      },
+      "then": {
+        "required": ["POINT"]
+      }
+    },
+    {
+      "if": {
+        "anyOf": [
+          { "not": { "required": ["STATUS"] } },
+          { "properties": { "STATUS": { "enum": ["continue", "start"] } } }
+        ]
+      },
+      "then": {
+        "anyOf": [
+          { "required": ["POINT"] },
+          { "required": ["PRESS"] },
+          { "required": ["TYPE"] },
+          { "required": ["DEEP_LINK"] },
+          { "required": ["CLEAR"] },
+          { "required": ["duration"] }
+        ]
+      }
+    },
