@@ -58,30 +58,42 @@ gs://gresearch/android_control/test_subsplits.json
 
 
 
-"allOf": [
-    {
-      "if": {
-        "required": ["to"]
-      },
-      "then": {
-        "required": ["POINT"]
-      }
-    },
-    {
-      "if": {
-        "anyOf": [
-          { "not": { "required": ["STATUS"] } },
-          { "properties": { "STATUS": { "enum": ["continue", "start"] } } }
-        ]
-      },
-      "then": {
-        "anyOf": [
-          { "required": ["POINT"] },
-          { "required": ["PRESS"] },
-          { "required": ["TYPE"] },
-          { "required": ["DEEP_LINK"] },
-          { "required": ["CLEAR"] },
-          { "required": ["duration"] }
-        ]
-      }
-    },
+futures = []
+    for task_args in tqdm(tasks):
+        r = process_step(task_args)
+        futures.append(r)
+    for future in tqdm(as_completed(futures), total=len(futures), desc="Processing steps"):
+        result = future.result()
+        print(result)运行到第二个for循环时又出现[2025-07-31 16:24:24,921] ERROR - RUN - run_eval.py: main - 137: Model RFT x Dataset AC-Low combination failed: 'str' object has no attribute '_condition', skipping this combination.
+Traceback (most recent call last):
+  File "/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/run_eval.py", line 125, in main
+    evaluate(final_result_args)
+  File "/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/utils/eval/run_eval_agent_honor.py", line 150, in evaluate
+    convert2aitz(input_abs_path, output_abs_dir, max_workers=16)
+  File "/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/utils/eval/utils/convert_output.py", line 134, in convert2aitz
+    for future in tqdm(as_completed(futures), total=len(futures), desc="Processing steps"):
+  File "/opt/nas/p/conda/envs/torch_cmx/lib/python3.10/site-packages/tqdm/std.py", line 1181, in __iter__
+    for obj in iterable:
+  File "/opt/nas/p/conda/envs/torch_cmx/lib/python3.10/concurrent/futures/_base.py", line 224, in as_completed
+    with _AcquireFutures(fs):
+  File "/opt/nas/p/conda/envs/torch_cmx/lib/python3.10/concurrent/futures/_base.py", line 151, in __enter__
+    future._condition.acquire()
+AttributeError: 'str' object has no attribute '_condition'
+[2025-07-31 16:24:24] ERROR - run_eval.py: main - 137: Model RFT x Dataset AC-Low combination failed: 'str' object has no attribute '_condition', skipping this combination.
+Traceback (most recent call last):
+  File "/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/run_eval.py", line 125, in main
+    evaluate(final_result_args)
+  File "/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/utils/eval/run_eval_agent_honor.py", line 150, in evaluate
+    convert2aitz(input_abs_path, output_abs_dir, max_workers=16)
+  File "/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/utils/eval/utils/convert_output.py", line 134, in convert2aitz
+    for future in tqdm(as_completed(futures), total=len(futures), desc="Processing steps"):
+  File "/opt/nas/p/conda/envs/torch_cmx/lib/python3.10/site-packages/tqdm/std.py", line 1181, in __iter__
+    for obj in iterable:
+  File "/opt/nas/p/conda/envs/torch_cmx/lib/python3.10/concurrent/futures/_base.py", line 224, in as_completed
+    with _AcquireFutures(fs):
+  File "/opt/nas/p/conda/envs/torch_cmx/lib/python3.10/concurrent/futures/_base.py", line 151, in __enter__
+    future._condition.acquire()
+AttributeError: 'str' object has no attribute '_condition'
+The program finished and will be restarted
+> /opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/run_eval.py(1)<module>()
+-> import torch
