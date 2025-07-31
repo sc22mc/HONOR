@@ -41,9 +41,16 @@ gs://gresearch/android_control/android_control-00019-of-00020
 gs://gresearch/android_control/splits.json
 gs://gresearch/android_control/test_subsplits.json
 
-创建一个目录
-(torch_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3# gsutil -m cp gs://gresearch/android_control/* ./android_control/
-
+{
+    "query": "You are a well-trained mobile intelligent agent capable of assisting users with step-by-step navigation tasks. Given the current smartphone screenshot <image> and the user instruction:\nInstruction: \"finish the task\"\nAction History: \"Click on the search icon. \nEnter Newark in the text box. \nClick on the suggestion. \n\"\n\nPlease output the correct function call to accomplish the user instruction. Besides the function call, you should not output any other content.\nYou can call the following functions to control the smartphone.\n- UI Basic Operations:\n    1. tap(x: float,y: float) This function is used to click on a specific point on the smartphone screen. The coordinates x and y indicate the click position.  \n    2. scroll(x: float, y: float,direction: str) This function is used to swipe from the starting coordinates (x, y) in the specified direction. The coordinates x and y represent the center position of the control to be swiped. The direction can be \"up\", \"down\", \"left\", or \"right\".\n    3. text(x: float,y: float,text_input: str) This function is used to input the specified text at the given coordinates. The coordinates x and y represent the center position of the control to be clicked.\n- Phone Key Operations:\n    4. navigate_back() This function is used to return to the previous screen on the smartphone.\n    5. navigate_home() This function is used to return to the home screen of the phone.\n- Other Operations:\n    6. long_press(x: float,y: float) This function is used to perform a long press action at a specific point on the smartphone screen. The coordinates x and y indicate the long press position.\n    7. wait() This function is to wait at current page.\n    ",
+    "response": "finish()",
+    "history": [],
+    "images": [
+        "/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/tmp/android_control/screenshots/18310/screenshot_18310_3.png"
+    ],
+    "image_width": 1080,
+    "image_height": 2400
+},
 
 
 
