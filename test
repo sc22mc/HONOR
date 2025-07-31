@@ -58,37 +58,12 @@ gs://gresearch/android_control/test_subsplits.json
 
 
 
-with ProcessPoolExecutor(max_workers=max_workers) as executor:
-        futures = [executor.submit(process_step, task_args) for task_args in tasks]        
-
-这一段在运行到第二行时出现Error, JSON is NOT valid according to the schema.
+except Exception as e:
+        print('Error, JSON is NOT valid according to the schema.')
+        print(f"{e.message}")
+        print(f"{list(e.path)}")
+        print(f"{list(e.schema_path)}")输出
 Error, JSON is NOT valid according to the schema.
-Error, JSON is NOT valid according to the schema.，且数据量小的时候能继续执行，数据量大的时候就很久看不到反应已知
-
-def process_step(args):
-    task, episode_id, step_id, pred, base_path = args
-    try:
-        actions, parameters, status = parse_action(pred)
-
-        transformed_entry = {
-            "action_predict": {
-                "COA": {
-                    "txt": {
-                        "ACTION": actions,
-                        "ARGS": parameters,
-                        "STATUS": status
-                    },
-                }
-            }
-        }
-
-        folder = f"{task}-{episode_id}"
-        file_name = f"{folder}_{step_id}.json"
-        output_file_path = os.path.join(base_path, folder, file_name)
-
-        with open(output_file_path, 'w', encoding='utf-8') as output_file:
-            json.dump(transformed_entry, output_file, indent=4, ensure_ascii=False)
-        
-        return f"Saved transformed entry to: {output_file_path}"
-    except Exception as e:
-        return f"Error processing step {step_id} in episode {episode_id}: {e}"
+{'STATUS': 'continue'} is not valid under any of the given schemas
+[]
+['allOf', 1, 'then', 'anyOf']
