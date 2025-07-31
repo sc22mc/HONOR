@@ -358,25 +358,8 @@ if __name__ == "__main__":
 
 
 
-(torch_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/utils/eval/utils# ls
-action_type.py  convert_output.py  evaluator_honor.py  __init__.py  __pycache__  schema  utils.py
-
-(torch_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3# python run_eval.py --data AC-Low --model /opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/models/RFT --model_type MagicGUI --mode all
-Traceback (most recent call last):
-  File "/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/run_eval.py", line 4, in <module>
-    from utils.eval import infer_data_job, convert_xlsx_to_jsonl, convert_to_template
-  File "/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/utils/eval/__init__.py", line 4, in <module>
-    from .run_eval_agent_honor import evaluate
-  File "/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/utils/eval/run_eval_agent_honor.py", line 7, in <module>
-    from .utils.convert_output import convert2aitz
-  File "/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/utils/eval/utils/__init__.py", line 3, in <module>
-    from .evaluator_honor import HonorActionEvaluator
-  File "/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/utils/eval/utils/evaluator_honor.py", line 7, in <module>
-    from utils import annotate_and_save_image
-ImportError: cannot import name 'annotate_and_save_image' from 'utils' (/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/utils/__init__.py)
-from .convert_output import convert2aitz
-__init__为
-from .evaluator_honor import HonorActionEvaluator
-from .utils import get_dataset_dir
+(torch_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/utils# python -m pdb eval.run_eval_agent_honor.py --input_path /opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/outputs/RFT/T20250731_Ge8598785/AC-Low_modified.jsonl --output_dir /opt/n
+as/p/mm/ie_env/cmx/HONOR_TEST3/outputs/RFT/T20250731_Ge8598785/final_result --data_name android_control_low_test --eval_android_control
+Error: eval.run_eval_agent_honor.py does not exist
 
 
