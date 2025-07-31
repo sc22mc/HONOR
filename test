@@ -357,9 +357,133 @@ if __name__ == "__main__":
 
 
 
+convert2aitz(os.path.abspath(args.input_path), os.path.abspath(args.output_dir), max_workers=16)其中def convert2aitz(input_path, output_path, max_workers=None):
+    data = load_json_data(input_path)
+    base_path = os.path.join(output_path)
+    folders = set()
+    tasks = []
+    for item in data:
+        task = item.get("category", item.get("subset", "unknown"))
+        episode_id = item.get("episode_id", "unknown")
+        steps = item.get("steps", [item])
 
-(torch_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/utils# python -m pdb eval.run_eval_agent_honor.py --input_path /opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/outputs/RFT/T20250731_Ge8598785/AC-Low_modified.jsonl --output_dir /opt/n
-as/p/mm/ie_env/cmx/HONOR_TEST3/outputs/RFT/T20250731_Ge8598785/final_result --data_name android_control_low_test --eval_android_control
-Error: eval.run_eval_agent_honor.py does not exist
+        for index, each_step in enumerate(steps):
+            step_id = index if "steps" in item else each_step.get("step_id", index)
+            folder = f"{task}-{episode_id}"
+            folders.add(folder)
+            pred = each_step.get("pred", {})
+            tasks.append((task, episode_id, step_id, pred, base_path))
+    
+    for folder in folders:
+        folder_path = os.path.join(base_path, folder)
+        os.makedirs(folder_path, exist_ok=True)
+    
+    with ProcessPoolExecutor(max_workers=max_workers) as executor:
+        futures = [executor.submit(process_step, task_args) for task_args in tasks]        
+        for future in tqdm(as_completed(futures), total=len(futures), desc="Processing steps"):
+            result = future.result()
+            print(result)
 
+
+# # Single-threaded version
+def convert2aitz_single_thread(input_path, output_path):
+    data = load_json_data(input_path)    
+    base_path = os.path.join(output_path)
+
+    for item in data:
+        task = item.get("category", "unknown")
+        episode_id = item.get("episode_id", "unknown")
+        steps = item.get("steps", [item])
+
+        for index, each_step in enumerate(steps):
+            step_id = index if "steps" in item else each_step.get("step_id", index)
+
+            actions, parameters, status = parse_action(each_step["pred"])
+
+            transformed_entry = {
+                "action_predict": {
+                    "COA": {
+                        "txt": {
+                            "ACTION": actions,
+                            "ARGS": parameters,
+                            "STATUS": status
+                        },
+                    }
+                }
+            }
+            folder = f"{task}-{episode_id}"
+            file_name = f"{folder}_{step_id}.json"
+            folder_path = os.path.join(base_path, folder)
+            output_path = os.path.join(folder_path, file_name)
+
+            os.makedirs(folder_path, exist_ok=True)
+
+            with open(output_path, 'w', encoding='utf-8') as output_file:
+                json.dump(transformed_entry, output_file, indent=4, ensure_ascii=False)
+
+            print(f"Saved transformed entry to: {output_path}")运行时出现huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
+To disable this warning, you can either:
+        - Avoid using `tokenizers` before the fork if possible
+        - Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
+To disable this warning, you can either:
+        - Avoid using `tokenizers` before the fork if possible
+        - Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
+To disable this warning, you can either:
+        - Avoid using `tokenizers` before the fork if possible
+        - Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
+To disable this warning, you can either:
+        - Avoid using `tokenizers` before the fork if possible
+        - Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
+To disable this warning, you can either:
+        - Avoid using `tokenizers` before the fork if possible
+        - Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
+To disable this warning, you can either:
+        - Avoid using `tokenizers` before the fork if possible
+        - Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
+To disable this warning, you can either:
+        - Avoid using `tokenizers` before the fork if possible
+        - Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
+To disable this warning, you can either:
+        - Avoid using `tokenizers` before the fork if possible
+        - Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
+To disable this warning, you can either:
+        - Avoid using `tokenizers` before the fork if possible
+        - Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
+To disable this warning, you can either:
+        - Avoid using `tokenizers` before the fork if possible
+        - Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
+To disable this warning, you can either:
+        - Avoid using `tokenizers` before the fork if possible
+        - Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
+To disable this warning, you can either:
+        - Avoid using `tokenizers` before the fork if possible
+        - Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
+To disable this warning, you can either:
+        - Avoid using `tokenizers` before the fork if possible
+        - Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
+To disable this warning, you can either:
+        - Avoid using `tokenizers` before the fork if possible
+        - Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
+To disable this warning, you can either:
+        - Avoid using `tokenizers` before the fork if possible
+        - Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
+To disable this warning, you can either:
+        - Avoid using `tokenizers` before the fork if possible
+        - Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+Processing steps:   0%|                                                                                                                                                                                                            | 0/9 [00:00<?, ?it/s]Error, JSON is NOT valid according to the schema.
 
