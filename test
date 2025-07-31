@@ -54,21 +54,41 @@ gs://gresearch/android_control/test_subsplits.json
 
 
 
-import os
-import json
 
-def strip_image_path_prefix(jsonl_path: str):
-    """修改 JSONL 文件中每行的 image_path 字段，仅保留文件名"""
-    temp_path = jsonl_path + ".tmp"
 
-    with open(jsonl_path, 'r', encoding='utf-8') as fr, open(temp_path, 'w', encoding='utf-8') as fw:
-        for line in fr:
-            if not line.strip():
-                continue  # 跳过空行
-            obj = json.loads(line)
-            if "image_path" in obj:
-                obj["image_path"] = os.path.basename(obj["image_path"])
-            fw.write(json.dumps(obj, ensure_ascii=False) + "\n")
 
-    # 替换原文件
-    os.replace(temp_path, jsonl_path)
+
+with ProcessPoolExecutor(max_workers=max_workers) as executor:
+        futures = [executor.submit(process_step, task_args) for task_args in tasks]        
+
+这一段在运行到第二行时出现Error, JSON is NOT valid according to the schema.
+Error, JSON is NOT valid according to the schema.
+Error, JSON is NOT valid according to the schema.，且数据量小的时候能继续执行，数据量大的时候就很久看不到反应已知
+
+def process_step(args):
+    task, episode_id, step_id, pred, base_path = args
+    try:
+        actions, parameters, status = parse_action(pred)
+
+        transformed_entry = {
+            "action_predict": {
+                "COA": {
+                    "txt": {
+                        "ACTION": actions,
+                        "ARGS": parameters,
+                        "STATUS": status
+                    },
+                }
+            }
+        }
+
+        folder = f"{task}-{episode_id}"
+        file_name = f"{folder}_{step_id}.json"
+        output_file_path = os.path.join(base_path, folder, file_name)
+
+        with open(output_file_path, 'w', encoding='utf-8') as output_file:
+            json.dump(transformed_entry, output_file, indent=4, ensure_ascii=False)
+        
+        return f"Saved transformed entry to: {output_file_path}"
+    except Exception as e:
+        return f"Error processing step {step_id} in episode {episode_id}: {e}"
