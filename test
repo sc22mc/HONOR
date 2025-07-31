@@ -54,63 +54,21 @@ gs://gresearch/android_control/test_subsplits.json
 
 
 
-#!/bin/bash
-set -x  # 开启调试输出
+import os
+import json
 
-# 设置 NCCL 环境变量（单卡也可以保留，兼容性好）
-export NCCL_IB_DISABLE=0
-export NCCL_P2P_DISABLE=0
-export NCCL_SOCKET_IFNAME=eth0
+def strip_image_path_prefix(jsonl_path: str):
+    """修改 JSONL 文件中每行的 image_path 字段，仅保留文件名"""
+    temp_path = jsonl_path + ".tmp"
 
-# 固定模型和数据路径
-MODEL_PATH="/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/models/RFT"
-MODEL_TYPE="qwen2_vl"
-DATA_PATH="/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/odyssey_honor_initial_test/odyssey_test_hl_short.jsonl"
-OUTPUT_DIR="/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/odyssey_honor_initial_test/CPT729/infer_full_hl"
-RESULT_PATH="$OUTPUT_DIR/response_odysseyl_nothink.json"
-LOG_PATH="$OUTPUT_DIR/infer.log"
+    with open(jsonl_path, 'r', encoding='utf-8') as fr, open(temp_path, 'w', encoding='utf-8') as fw:
+        for line in fr:
+            if not line.strip():
+                continue  # 跳过空行
+            obj = json.loads(line)
+            if "image_path" in obj:
+                obj["image_path"] = os.path.basename(obj["image_path"])
+            fw.write(json.dumps(obj, ensure_ascii=False) + "\n")
 
-# 创建输出目录
-mkdir -p "$OUTPUT_DIR"
-
-# 单卡推理
-CUDA_VISIBLE_DEVICES=0 swift infer \
-    --model "$MODEL_PATH" \
-    --model_type "$MODEL_TYPE" \
-    --val_dataset "$DATA_PATH" \
-    --infer_backend pt \
-    --max_batch_size 1 \
-    --temperature 0 \
-    --result_path "$RESULT_PATH" \
-    --max_new_tokens 512 &> "$LOG_PATH"
-
-运行时出现
-
-run sh: `/opt/nas/p/conda/envs/torch_cmx/bin/python3.10 /opt/nas/p/conda/envs/torch_cmx/lib/python3.10/site-packages/swift/cli/infer.py --model /opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/models/RFT --model_type qwen2_vl --val_dataset /opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/odyssey_honor_initial_test/odyssey_test_hl_short.jsonl --infer_backend pt --max_batch_size 1 --temperature 0 --result_path /opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/odyssey_honor_initial_test/CPT729/infer_full_hl/response_odysseyl_nothink.json --max_new_tokens 512`
-[INFO:swift] Successfully registered `/opt/nas/p/conda/envs/torch_cmx/lib/python3.10/site-packages/swift/llm/dataset/data/dataset_info.json`.
-[INFO:swift] Successfully loaded /opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/models/RFT/args.json.
-Traceback (most recent call last):
-  File "/opt/nas/p/conda/envs/torch_cmx/lib/python3.10/site-packages/swift/cli/infer.py", line 5, in <module>
-    infer_main()
-  File "/opt/nas/p/conda/envs/torch_cmx/lib/python3.10/site-packages/swift/llm/infer/infer.py", line 277, in infer_main
-    return SwiftInfer(args).main()
-  File "/opt/nas/p/conda/envs/torch_cmx/lib/python3.10/site-packages/swift/llm/infer/infer.py", line 24, in __init__
-    super().__init__(args)
-  File "/opt/nas/p/conda/envs/torch_cmx/lib/python3.10/site-packages/swift/llm/base.py", line 19, in __init__
-    self.args = self._parse_args(args)
-  File "/opt/nas/p/conda/envs/torch_cmx/lib/python3.10/site-packages/swift/llm/base.py", line 31, in _parse_args
-    args, remaining_argv = parse_args(self.args_class, args)
-  File "/opt/nas/p/conda/envs/torch_cmx/lib/python3.10/site-packages/swift/utils/utils.py", line 151, in parse_args
-    args, remaining_args = parser.parse_args_into_dataclasses(argv, return_remaining_strings=True)
-  File "/opt/nas/p/conda/envs/torch_cmx/lib/python3.10/site-packages/transformers/hf_argparser.py", line 358, in parse_args_into_dataclasses
-    obj = dtype(**inputs)
-  File "<string>", line 124, in __init__
-  File "/opt/nas/p/conda/envs/torch_cmx/lib/python3.10/site-packages/swift/llm/argument/infer_args.py", line 200, in __post_init__
-    BaseArguments.__post_init__(self)
-  File "/opt/nas/p/conda/envs/torch_cmx/lib/python3.10/site-packages/swift/llm/argument/base_args/base_args.py", line 154, in __post_init__
-    self._import_external_plugins()
-  File "/opt/nas/p/conda/envs/torch_cmx/lib/python3.10/site-packages/swift/llm/argument/base_args/base_args.py", line 117, in _import_external_plugins
-    import_external_file(external_plugin)
-  File "/opt/nas/p/conda/envs/torch_cmx/lib/python3.10/site-packages/swift/utils/utils.py", line 321, in import_external_file
-    assert os.path.isdir(py_dir), f'py_dir: {py_dir}'
-AssertionError: py_dir: /opt/nas/p/dongshaokang/AgentCPM-GUI/eval/examples/train/grpo/plugin
+    # 替换原文件
+    os.replace(temp_path, jsonl_path)
