@@ -383,4 +383,8 @@ print(f"Save test set at: {output_test_dir}")
 
 
 
-hf_guiifulQDqdZOyCiRzzYlcyHKjHhSwAL   YC
+[1583,122,118,160]对应<|box_start|>(670,74),(720,171)<|box_end|>
+[2253,60,80,67]对应<|box_start|>(954,36),(988,77)<|box_end|>
+[366,1196,235,286]对应<|box_start|>(285,431),(469,534)<|box_end|>
+[461,892,146,131]对应<|box_start|>(195,543),(257,623)<|box_end|>
+[67,2215,1155,136]对应<|box_start|>(52,798),(954,847)<|box_end|>
