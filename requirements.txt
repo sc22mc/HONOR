@@ -1,29 +1,48 @@
 import pandas as pd
 import os
+import json
 from pathlib import Path
+from PIL import Image
+import io
 
+# 源 parquet 数据目录
 parquet_dir = Path("./tmp/ScreenSpot-v2-mobile/data")
 files = list(parquet_dir.glob("*parquet"))
 
-for file in files:
-    df = pd.read_parquet(file)
-    print(df.head(1))
-    break
+# 目标目录
+target_root = Path(os.path.dirname(os.path.dirname(__file__))) / 'ScreenSpot_v2_mobile'
+images_dir = target_root / 'images'
+jsonl_path = target_root / 'data.jsonl'
 
-target_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),'ScreenSpot_v2_mobile')
-print(target_path)
+# 创建目录
+os.makedirs(images_dir, exist_ok=True)
 
-(torch_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/datasets/eval_data# python /opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/datasets/eval_data/process_screenspotv2.py
-                                     file_name  \
-0  pc_ede36f9b-1154-4f76-b7f8-c15d7d3f9b6e.png   
+# 写入 jsonl 文件
+with open(jsonl_path, 'w', encoding='utf-8') as jsonl_file:
+    idx = 0
+    for file in files:
+        df = pd.read_parquet(file)
+        for _, row in df.iterrows():
+            # 保存图像
+            image_bytes = row['image']['bytes']
+            image_name = row['file_name']
+            image_path = images_dir / image_name
+            image = Image.open(io.BytesIO(image_bytes))
+            image.save(image_path)
 
-                                               image  \
-0  {'bytes': b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHD...   
+            # bbox 转换为目标格式
+            bbox = row['bbox']
+            x1, y1, x2, y2 = [int(b * 1000) for b in bbox]
+            bbox_str = f"<|box_start|>({x1},{y1})({x2},{y2})<|box_end|>"
 
-                                                bbox        instruction  \
-0  [0.9479166666666666, 0.14444444444444443, 0.99...  close this window   
+            # 构造 JSON 行
+            record = {
+                "id": idx,
+                "images": [image_name],
+                "query": row['instruction'],
+                "response": bbox_str
+            }
+            jsonl_file.write(json.dumps(record, ensure_ascii=False) + "\n")
+            idx += 1
 
-  data_type data_source  
-0      icon     windows  
-/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/datasets/ScreenSpot_v2_mobile
-(torch_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/datasets/eval_data# 
+print(f"数据已保存到: {target_root}")
