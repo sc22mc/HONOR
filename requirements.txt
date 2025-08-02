@@ -40,12 +40,16 @@ with open(jsonl_path, 'w', encoding='utf-8') as jsonl_file:
             x1, y1, x2, y2 = [int(b * 1000) for b in bbox]
             bbox_str = f"<|box_start|>({x1},{y1})({x2},{y2})<|box_end|>"
 
+            # 构造 type 字段
+            type_str = f"t2_{row['data_type']}&t3_{row['data_source']}"
+
             # 构造 JSON 行
             record = {
                 "id": idx,
                 "images": [image_name],
                 "query": row['instruction'],
-                "response": bbox_str
+                "response": bbox_str,
+                "type": type_str
             }
             jsonl_file.write(json.dumps(record, ensure_ascii=False) + "\n")
             idx += 1
