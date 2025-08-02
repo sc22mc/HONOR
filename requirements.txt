@@ -12,3 +12,18 @@ for file in files:
 
 target_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),'ScreenSpot_v2_mobile')
 print(target_path)
+
+(torch_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/datasets/eval_data# python /opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/datasets/eval_data/process_screenspotv2.py
+                                     file_name  \
+0  pc_ede36f9b-1154-4f76-b7f8-c15d7d3f9b6e.png   
+
+                                               image  \
+0  {'bytes': b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHD...   
+
+                                                bbox        instruction  \
+0  [0.9479166666666666, 0.14444444444444443, 0.99...  close this window   
+
+  data_type data_source  
+0      icon     windows  
+/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/datasets/ScreenSpot_v2_mobile
+(torch_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/datasets/eval_data# 
