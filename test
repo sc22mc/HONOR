@@ -383,8 +383,28 @@ print(f"Save test set at: {output_test_dir}")
 
 
 
-[1583,122,118,160]对应<|box_start|>(670,74),(720,171)<|box_end|>
-[2253,60,80,67]对应<|box_start|>(954,36),(988,77)<|box_end|>
-[366,1196,235,286]对应<|box_start|>(285,431),(469,534)<|box_end|>
-[461,892,146,131]对应<|box_start|>(195,543),(257,623)<|box_end|>
-[67,2215,1155,136]对应<|box_start|>(52,798),(954,847)<|box_end|>
+import os
+import subprocess
+import zipfile
+
+# 创建目标路径
+target_dir = './tmp/OS-OS-Atlas-data'
+os.makedirs(target_dir, exist_ok=True)
+
+# 下载文件
+image_zip_url = "https://huggingface.co/datasets/OS-Copilot/OS-Atlas-data/resolve/main/mobile_domain/mobile_images.zip"
+json_url = "https://huggingface.co/datasets/OS-Copilot/OS-Atlas-data/resolve/main/mobile_domain/aw_mobile.json"
+
+image_zip_path = os.path.join(target_dir, 'mobile_images.zip')
+json_path = os.path.join(target_dir, 'aw_mobile.json')
+
+# 使用wget下载
+subprocess.run(['wget', '-O', image_zip_path, image_zip_url], check=True)
+subprocess.run(['wget', '-O', json_path, json_url], check=True)
+
+# 解压zip文件
+with zipfile.ZipFile(image_zip_path, 'r') as zip_ref:
+    zip_ref.extractall(target_dir)
+
+print("下载和解压完成。")
+
