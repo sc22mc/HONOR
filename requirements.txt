@@ -23,9 +23,14 @@ with open(jsonl_path, 'w', encoding='utf-8') as jsonl_file:
     for file in files:
         df = pd.read_parquet(file)
         for _, row in df.iterrows():
+            image_name = row['file_name']
+            
+            # ✅ 只处理以 "mobile" 开头的图像
+            if not image_name.startswith("mobile"):
+                continue
+
             # 保存图像
             image_bytes = row['image']['bytes']
-            image_name = row['file_name']
             image_path = images_dir / image_name
             image = Image.open(io.BytesIO(image_bytes))
             image.save(image_path)
