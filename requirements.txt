@@ -1,15 +1,17 @@
 import os
 import json
-
 from pathlib import Path
 
-# 指定源目录和目标ID
-source_dir = Path(os.path.join(os.path.dirname(os.path.abspath(__file__)),'./tmp/Os-Atlas-mobile'))
+# 当前脚本文件路径
+current_script_path = Path(os.path.abspath(__file__))
+
+# 源目录为当前脚本目录下的 ./tmp/Os-Atlas-mobile
+source_dir = current_script_path.parent / 'tmp' / 'Os-Atlas-mobile'
 json_path = source_dir / 'aw_mobile.json'
 target_ids = [1, 2, 442, 544]
 
-# 输出目录结构
-output_dir = source_dir.parent / 'Os-Atlas-mobile'
+# 输出目录为当前脚本的父目录的父目录下的 Os-Atlas-mobile
+output_dir = current_script_path.parent.parent / 'Os-Atlas-mobile'
 output_images_dir = output_dir / 'images'
 output_jsonl_path = output_dir / 'OS-Atlas-mobile.jsonl'
 
@@ -40,7 +42,7 @@ for idx in target_ids:
         if bbox and len(bbox) == 4:
             x1, y1, x2, y2 = [int(b * 1000) for b in bbox]
             responses.append(f"<|box_start|>({x1},{y1}),({x2},{y2})<|box_end|>")
-    
+
     response_str = ' '.join(responses)
 
     # 构建一条 JSONL 数据
