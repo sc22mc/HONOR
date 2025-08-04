@@ -2,15 +2,15 @@ import os
 import json
 from pathlib import Path
 
-# 当前脚本文件路径
+# 当前脚本路径
 current_script_path = Path(os.path.abspath(__file__))
 
-# 源目录为当前脚本目录下的 ./tmp/Os-Atlas-mobile
+# 源数据位置：./tmp/Os-Atlas-mobile/aw_mobile.json（相对路径）
 source_dir = current_script_path.parent / 'tmp' / 'Os-Atlas-mobile'
 json_path = source_dir / 'aw_mobile.json'
 target_ids = [1, 2, 442, 544]
 
-# 输出目录为当前脚本的父目录的父目录下的 Os-Atlas-mobile
+# 目标输出目录：当前脚本父目录的父目录下
 output_dir = current_script_path.parent.parent / 'Os-Atlas-mobile'
 output_images_dir = output_dir / 'images'
 output_jsonl_path = output_dir / 'OS-Atlas-mobile.jsonl'
@@ -22,41 +22,37 @@ output_images_dir.mkdir(parents=True, exist_ok=True)
 with open(json_path, 'r', encoding='utf-8') as f:
     all_data = json.load(f)
 
-# 构建目标 JSONL 行
+# 收集目标条目
 output_entries = []
+current_element_id = 0  # element 全局计数器
 
-for idx in target_ids:
-    try:
-        item = all_data[idx]
-    except IndexError:
-        print(f"Warning: ID {idx} out of range.")
-        continue
+for item in all_data:
+    img_filename = item.get('img_filename', '')
+    elements = item.get('elements', [])
+    
+    for element in elements:
+        if current_element_id in target_ids:
+            # 提取内容
+            instruction = element.get('instruction', '')
+            bbox = element.get('bbox', [])
+            
+            if len(bbox) == 4:
+                x1, y1, x2, y2 = [int(b * 1000) for b in bbox]
+                response = f"<|box_start|>({x1},{y1}),({x2},{y2})<|box_end|>"
+                
+                jsonl_item = {
+                    "id": current_element_id,
+                    "query": instruction,
+                    "response": response,
+                    "images": [img_filename]
+                }
+                output_entries.append(jsonl_item)
 
-    img_filename = item['img_filename']
-    instruction = item.get('instruction', '')
+        current_element_id += 1
 
-    # 遍历 elements 构建响应字符串
-    responses = []
-    for element in item.get('elements', []):
-        bbox = element.get('bbox')
-        if bbox and len(bbox) == 4:
-            x1, y1, x2, y2 = [int(b * 1000) for b in bbox]
-            responses.append(f"<|box_start|>({x1},{y1}),({x2},{y2})<|box_end|>")
-
-    response_str = ' '.join(responses)
-
-    # 构建一条 JSONL 数据
-    jsonl_item = {
-        "id": idx,
-        "query": instruction,
-        "response": response_str,
-        "images": [img_filename]
-    }
-    output_entries.append(jsonl_item)
-
-# 写入 jsonl 文件
+# 写入 JSONL 文件
 with open(output_jsonl_path, 'w', encoding='utf-8') as f:
     for entry in output_entries:
         f.write(json.dumps(entry, ensure_ascii=False) + '\n')
 
-print(f"Written {len(output_entries)} entries to {output_jsonl_path}")
+print(f"✅ 提取并写入了 {len(output_entries)} 条 element 到 {output_jsonl_path}")
