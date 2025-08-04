@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 # 指定源目录和目标ID
-source_dir = Path('./tmp/os-Atlas-mobile')
+source_dir = Path(os.path.join(os.path.dirname(os.path.abspath(__file__)),'./tmp/Os-Atlas-mobile'))
 json_path = source_dir / 'aw_mobile.json'
 target_ids = [1, 2, 442, 544]
 
