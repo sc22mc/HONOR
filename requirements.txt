@@ -1,19 +1,23 @@
 import os
 import json
+import shutil
 from pathlib import Path
 
 # 当前脚本路径
 current_script_path = Path(os.path.abspath(__file__))
 
-# 源数据位置：./tmp/Os-Atlas-mobile/aw_mobile.json（相对路径）
+# 源目录（原始数据和图片）
 source_dir = current_script_path.parent / 'tmp' / 'Os-Atlas-mobile'
+source_images_dir = source_dir / 'images'
 json_path = source_dir / 'aw_mobile.json'
-target_ids = [1, 2, 442, 544]
 
-# 目标输出目录：当前脚本父目录的父目录下
+# 目标目录（输出数据和图片）
 output_dir = current_script_path.parent.parent / 'Os-Atlas-mobile'
 output_images_dir = output_dir / 'images'
 output_jsonl_path = output_dir / 'OS-Atlas-mobile.jsonl'
+
+# 指定要提取的 element 索引
+target_ids = [1, 2, 442, 544]
 
 # 创建输出目录
 output_images_dir.mkdir(parents=True, exist_ok=True)
@@ -22,9 +26,10 @@ output_images_dir.mkdir(parents=True, exist_ok=True)
 with open(json_path, 'r', encoding='utf-8') as f:
     all_data = json.load(f)
 
-# 收集目标条目
+# 构建输出条目
 output_entries = []
-current_element_id = 0  # element 全局计数器
+used_images = set()
+current_element_id = 0
 
 for item in all_data:
     img_filename = item.get('img_filename', '')
@@ -32,14 +37,13 @@ for item in all_data:
     
     for element in elements:
         if current_element_id in target_ids:
-            # 提取内容
             instruction = element.get('instruction', '')
             bbox = element.get('bbox', [])
             
             if len(bbox) == 4:
                 x1, y1, x2, y2 = [int(b * 1000) for b in bbox]
                 response = f"<|box_start|>({x1},{y1}),({x2},{y2})<|box_end|>"
-                
+
                 jsonl_item = {
                     "id": current_element_id,
                     "query": instruction,
@@ -47,12 +51,24 @@ for item in all_data:
                     "images": [img_filename]
                 }
                 output_entries.append(jsonl_item)
+                used_images.add(img_filename)
 
         current_element_id += 1
 
-# 写入 JSONL 文件
+# 写入 jsonl 文件
 with open(output_jsonl_path, 'w', encoding='utf-8') as f:
     for entry in output_entries:
         f.write(json.dumps(entry, ensure_ascii=False) + '\n')
 
-print(f"✅ 提取并写入了 {len(output_entries)} 条 element 到 {output_jsonl_path}")
+print(f"✅ 写入了 {len(output_entries)} 条 JSONL 数据到 {output_jsonl_path}")
+
+# 复制图片
+for img_filename in used_images:
+    src_img_path = source_images_dir / img_filename
+    dst_img_path = output_images_dir / img_filename
+    if src_img_path.exists():
+        shutil.copy(src_img_path, dst_img_path)
+    else:
+        print(f"⚠️ 找不到图片文件: {src_img_path}")
+
+print(f"✅ 已复制 {len(used_images)} 张图片到 {output_images_dir}")
