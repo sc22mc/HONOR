@@ -1,18 +1,60 @@
+import os
 import json
 
-with open('/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/datasets/eval_data/tmp/OS-Atlas-mobile/aw_mobile.json','r') as f:
-    data = json.load(f)
-    for item in data:
-        print(item.keys()) # img_filename 和 elements
-        for element in item['elements']:
-            print(element.keys())
-        break
+from pathlib import Path
 
-ids = []
-with open('/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/datasets/Os-Atlas-mobile/OS-Atlas-mobile.jsonl','r',encoding='utf-8') as f:
-    for line in f:
-        data = json.loads(line)
-        ids.append(data['id'])
-        pass
-print(ids)
-print(len(ids))
+# 指定源目录和目标ID
+source_dir = Path('./tmp/os-Atlas-mobile')
+json_path = source_dir / 'aw_mobile.json'
+target_ids = [1, 2, 442, 544]
+
+# 输出目录结构
+output_dir = source_dir.parent / 'Os-Atlas-mobile'
+output_images_dir = output_dir / 'images'
+output_jsonl_path = output_dir / 'OS-Atlas-mobile.jsonl'
+
+# 创建输出目录
+output_images_dir.mkdir(parents=True, exist_ok=True)
+
+# 读取 JSON 数据
+with open(json_path, 'r', encoding='utf-8') as f:
+    all_data = json.load(f)
+
+# 构建目标 JSONL 行
+output_entries = []
+
+for idx in target_ids:
+    try:
+        item = all_data[idx]
+    except IndexError:
+        print(f"Warning: ID {idx} out of range.")
+        continue
+
+    img_filename = item['img_filename']
+    instruction = item.get('instruction', '')
+
+    # 遍历 elements 构建响应字符串
+    responses = []
+    for element in item.get('elements', []):
+        bbox = element.get('bbox')
+        if bbox and len(bbox) == 4:
+            x1, y1, x2, y2 = [int(b * 1000) for b in bbox]
+            responses.append(f"<|box_start|>({x1},{y1}),({x2},{y2})<|box_end|>")
+    
+    response_str = ' '.join(responses)
+
+    # 构建一条 JSONL 数据
+    jsonl_item = {
+        "id": idx,
+        "query": instruction,
+        "response": response_str,
+        "images": [img_filename]
+    }
+    output_entries.append(jsonl_item)
+
+# 写入 jsonl 文件
+with open(output_jsonl_path, 'w', encoding='utf-8') as f:
+    for entry in output_entries:
+        f.write(json.dumps(entry, ensure_ascii=False) + '\n')
+
+print(f"Written {len(output_entries)} entries to {output_jsonl_path}")
