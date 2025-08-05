@@ -1,74 +1,17 @@
-import os
-import json
-import shutil
-from pathlib import Path
+from datasets import load_dataset
 
-# 当前脚本路径
-current_script_path = Path(os.path.abspath(__file__))
-
-# 源目录（原始数据和图片）
-source_dir = current_script_path.parent / 'tmp' / 'Os-Atlas-mobile'
-source_images_dir = source_dir / 'images'
-json_path = source_dir / 'aw_mobile.json'
-
-# 目标目录（输出数据和图片）
-output_dir = current_script_path.parent.parent / 'Os-Atlas-mobile'
-output_images_dir = output_dir / 'images'
-output_jsonl_path = output_dir / 'OS-Atlas-mobile.jsonl'
-
-# 指定要提取的 element 索引
-target_ids = [1, 2, 442, 544]
-
-# 创建输出目录
-output_images_dir.mkdir(parents=True, exist_ok=True)
-
-# 读取 JSON 数据
-with open(json_path, 'r', encoding='utf-8') as f:
-    all_data = json.load(f)
-
-# 构建输出条目
-output_entries = []
-used_images = set()
-current_element_id = 0
-
-for item in all_data:
-    img_filename = item.get('img_filename', '')
-    elements = item.get('elements', [])
-    
-    for element in elements:
-        if current_element_id in target_ids:
-            instruction = element.get('instruction', '')
-            bbox = element.get('bbox', [])
-            
-            if len(bbox) == 4:
-                x1, y1, x2, y2 = [int(b * 1000) for b in bbox]
-                response = f"<|box_start|>({x1},{y1}),({x2},{y2})<|box_end|>"
-
-                jsonl_item = {
-                    "id": current_element_id,
-                    "query": instruction,
-                    "response": response,
-                    "images": [img_filename]
-                }
-                output_entries.append(jsonl_item)
-                used_images.add(img_filename)
-
-        current_element_id += 1
-
-# 写入 jsonl 文件
-with open(output_jsonl_path, 'w', encoding='utf-8') as f:
-    for entry in output_entries:
-        f.write(json.dumps(entry, ensure_ascii=False) + '\n')
-
-print(f"✅ 写入了 {len(output_entries)} 条 JSONL 数据到 {output_jsonl_path}")
-
-# 复制图片
-for img_filename in used_images:
-    src_img_path = source_images_dir / img_filename
-    dst_img_path = output_images_dir / img_filename
-    if src_img_path.exists():
-        shutil.copy(src_img_path, dst_img_path)
-    else:
-        print(f"⚠️ 找不到图片文件: {src_img_path}")
-
-print(f"✅ 已复制 {len(used_images)} 张图片到 {output_images_dir}")
+dataset = load_dataset(
+    "parquet",
+    data_files=["/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/datasets/eval_data/tmp/ScreenQA-short/test-00000-of-00002.parquet","/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/datasets/eval_data/tmp/ScreenQA-short/test-00001-of-00002.parquet"]
+)
+print(dataset['train'][54])
+index = 54
+print(dataset['train'][index]["screen_id"])
+print(dataset['train'][index]["question"])
+print(dataset['train'][index]c)
+print(dataset['train'][index]["file_name"])
+这段代码输出(torch_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/datasets/eval_data/tmp/ScreenQA-short# python /opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/datasets/eval_data/download_odyssey.py
+{'screen_id': '259', 'question': 'What is the city name?', 'ground_truth': ['San Francisco'], 'file_name': 'images/rico/259.jpg', 'image': <PIL.JpegImagePlugin.JpegImageFile image mode=RGB size=1080x1920 at 0x7F54113D2B00>}
+259
+What is the city name?
+['San Francisco']我现在需要你帮我写一个脚本，1.先给这个脚本的父文件的父文件目录下创建一个ScreenQA-short文件夹 2.这个文件夹创建一个images文件夹和一个ScreenQA-short.jsonl文件 3.把图片存入images下，这个jsonl文件每一行包含images:["图片文件名"]，query:对应question，response：ground_truth的第一个索引，other_responses：对应["ground_truth"]以及一个id对应第几个数据
