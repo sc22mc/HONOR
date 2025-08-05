@@ -1,78 +1,35 @@
-from datasets import load_dataset
+# .env 文件，将其放置在 $VLMEvalKit 下
+# 专有 VLMs 的 API 密钥
+# QwenVL APIs
+# DASHSCOPE_API_KEY='sk-84644e28eb0042b7963e85db8c377020'
+# Gemini w. Google Cloud Backends
+GOOGLE_API_KEY=
+# OpenAI API
+OPENAI_API_KEY=sk-123456
+OPENAI_API_BASE=http://0.0.0.0:23333/v1/chat/completions
+LOCAL_LLM=/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/models/Qwen2.5-7B-Instruct
+# StepAI API
+STEPAI_API_KEY=
+# REKA API
+REKA_API_KEY=
+# GLMV API
+GLMV_API_KEY=
+# CongRong API
+CW_API_BASE=
+CW_API_KEY=
+# SenseChat-V API
+SENSECHAT_AK=
+SENSECHAT_SK=
+# Hunyuan-Vision API
+HUNYUAN_SECRET_KEY=
+HUNYUAN_SECRET_ID=
+# 你可以设置一个评估时代理，评估阶段产生的 API 调用将通过这个代理进行
+EVAL_PROXY=
+# 本地的评估模型地址
+# EVAL_MODEL_PATH='/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/models/Qwen2.5-7B-Instruct'
 
-dataset = load_dataset(
-    "parquet",
-    data_files=["/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/datasets/eval_data/tmp/ScreenQA-short/test-00000-of-00002.parquet","/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/datasets/eval_data/tmp/ScreenQA-short/test-00001-of-00002.parquet"]
-)
-print(dataset['train'][54])
-index = 54
-print(dataset['train'][index]["screen_id"])
-print(dataset['train'][index]["question"])
-print(dataset['train'][index]c)
-print(dataset['train'][index]["file_name"])
-这段代码输出(torch_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/datasets/eval_data/tmp/ScreenQA-short# python /opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/datasets/eval_data/download_odyssey.py
-{'screen_id': '259', 'question': 'What is the city name?', 'ground_truth': ['San Francisco'], 'file_name': 'images/rico/259.jpg', 'image': <PIL.JpegImagePlugin.JpegImageFile image mode=RGB size=1080x1920 at 0x7F54113D2B00>}
-259
-What is the city name?
-['San Francisco']我现在需要你帮我写一个脚本，1.先给这个脚本的父文件的父文件目录下创建一个ScreenQA-short文件夹 2.这个文件夹创建一个images文件夹和一个ScreenQA-short.jsonl文件 3.把图片存入images下，这个jsonl文件每一行包含images:["图片文件名"]，query:对应question，response：ground_truth的第一个索引，other_responses：对应["ground_truth"]以及一个id对应第几个数据
 
 
+# 数据集缓存路径
+# LMUData='/opt/nas/p/mm/ie_env/HONOR/LMUData'
 
-
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-根据 ScreenQA-short Parquet 数据构建一个文件夹：
-1. <脚本父目录的父目录>/ScreenQA-short
-2. 其中包含 images/ 以及 ScreenQA-short.jsonl
-"""
-
-import json
-from pathlib import Path
-
-from datasets import load_dataset
-
-# === 0. 修改这里：Parquet 文件路径 ===
-PARQUET_FILES = [
-    "/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/datasets/eval_data/tmp/ScreenQA-short/test-00000-of-00002.parquet",
-    "/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/datasets/eval_data/tmp/ScreenQA-short/test-00001-of-00002.parquet",
-]
-
-# === 1. 计算目标目录 ===
-SCRIPT_DIR = Path(__file__).resolve().parent        # 当前脚本所在目录
-TARGET_DIR = SCRIPT_DIR.parent.parent / "ScreenQA-short"
-IMAGES_DIR = TARGET_DIR / "images"
-JSONL_PATH = TARGET_DIR / "ScreenQA-short.jsonl"
-
-TARGET_DIR.mkdir(parents=True, exist_ok=True)
-IMAGES_DIR.mkdir(exist_ok=True)
-
-# === 2. 载入数据集 ===
-ds = load_dataset(
-    "parquet",
-    data_files=PARQUET_FILES,
-    split="train",          # load_dataset 默认给出一个 'train' split
-)
-
-# === 3. 遍历并写入 ===
-with JSONL_PATH.open("w", encoding="utf-8") as f_jsonl:
-    for idx, example in enumerate(ds):
-        # 3.1 处理图片
-        #    example["file_name"] 形如 'images/rico/259.jpg' → 取最后一段作为文件名
-        image_filename = Path(example["file_name"]).name
-        image_save_path = IMAGES_DIR / image_filename
-        example["image"].save(image_save_path)
-
-        # 3.2 组织 JSON 行
-        record = {
-            "images": [image_filename],
-            "query": example["question"],
-            "response": example["ground_truth"][0] if example["ground_truth"] else "",
-            "other_responses": example["ground_truth"],
-            "id": idx,       # “第几个数据”——顺次从 0 开始
-        }
-        f_jsonl.write(json.dumps(record, ensure_ascii=False) + "\n")
-
-print(f"✅ 处理完成！生成目录：{TARGET_DIR}")
-print(f"   - 图片文件：{len(ds)} 张，保存在 {IMAGES_DIR}")
-print(f"   - JSONL 文件：{JSONL_PATH}")
