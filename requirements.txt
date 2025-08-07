@@ -1,1 +1,152 @@
-dfafasd
+from ..smp import *
+import os
+import sys
+import numpy as np
+import json
+from .base import BaseAPI
+from openai import OpenAI, AzureOpenAI
+from PIL import Image
+
+APIBASES = {
+    'OFFICIAL': 'https://api.openai.com/v1/chat/completions',
+}
+
+def GPT_context_window(model):
+    length_map = {
+        'gpt-4': 8192,
+        'gpt-4-0613': 8192,
+        'gpt-4-turbo-preview': 128000,
+        'gpt-4-1106-preview': 128000,
+        'gpt-4-0125-preview': 128000,
+        'gpt-4-vision-preview': 128000,
+        'gpt-4-turbo': 128000,
+        'gpt-4-turbo-2024-04-09': 128000,
+        'gpt-3.5-turbo': 16385,
+        'gpt-3.5-turbo-0125': 16385,
+        'gpt-3.5-turbo-1106': 16385,
+        'gpt-3.5-turbo-instruct': 4096,
+    }
+    return length_map.get(model, 128000)
+
+class OpenAIWrapper(BaseAPI):
+    is_api: bool = True
+
+    def __init__(self, model='gpt-3.5-turbo-0613', retry=5, key=None, verbose=False,
+                 system_prompt=None, temperature=0, timeout=300, api_base=None,
+                 max_tokens=2048, img_size=512, img_detail='low', use_azure=False, **kwargs):
+
+        self.model = model
+        self.cur_idx = 0
+        self.fail_msg = 'Failed to obtain answer via API. '
+        self.max_tokens = max_tokens
+        self.temperature = temperature
+        self.use_azure = use_azure
+
+        if use_azure:
+            key = key or os.getenv('AZURE_OPENAI_API_KEY')
+            assert key, 'Set AZURE_OPENAI_API_KEY.'
+            endpoint = os.getenv('AZURE_OPENAI_ENDPOINT')
+            deployment = os.getenv('AZURE_OPENAI_DEPLOYMENT_NAME')
+            version = os.getenv('OPENAI_API_VERSION')
+            assert endpoint and deployment and version, 'Azure environment variables not set.'
+            self.client = AzureOpenAI(api_key=key, azure_endpoint=endpoint, api_version=version)
+            self.api_base = f"{endpoint}/openai/deployments/{deployment}/chat/completions?api-version={version}"
+        else:
+            key = key or os.getenv('OPENAI_API_KEY')
+            assert key and key.startswith('sk-'), 'Invalid OPENAI_API_KEY.'
+            api_base = api_base or os.getenv('OPENAI_API_BASE', APIBASES['OFFICIAL'])
+            self.client = OpenAI(api_key=key, base_url=api_base)
+            self.api_base = api_base
+
+        self.key = key
+        self.img_size = img_size
+        self.img_detail = img_detail
+        self.timeout = timeout
+        self.o1_model = any(x in model for x in ['o1', 'o3', 'o4'])
+
+        super().__init__(retry=retry, system_prompt=system_prompt, verbose=verbose, **kwargs)
+        self.logger.info(f'Using API Base: {self.api_base}; API Key: {self.key}')
+
+    def prepare_itlist(self, inputs):
+        assert all(isinstance(x, dict) for x in inputs)
+        has_images = any(x['type'] == 'image' for x in inputs)
+        content_list = []
+        for msg in inputs:
+            if msg['type'] == 'text':
+                content_list.append({'type': 'text', 'text': msg['value']})
+            elif msg['type'] == 'image':
+                img = Image.open(msg['value'])
+                b64 = encode_image_to_base64(img, target_size=self.img_size)
+                img_struct = {'url': f'data:image/jpeg;base64,{b64}', 'detail': self.img_detail}
+                content_list.append({'type': 'image_url', 'image_url': img_struct})
+        if not has_images:
+            joined = '\n'.join([x['value'] for x in inputs])
+            content_list = [{'type': 'text', 'text': joined}]
+        return content_list
+
+    def prepare_inputs(self, inputs):
+        input_msgs = []
+        if self.system_prompt:
+            input_msgs.append({'role': 'system', 'content': self.system_prompt})
+        if 'role' in inputs[0]:
+            for item in inputs:
+                input_msgs.append({'role': item['role'], 'content': self.prepare_itlist(item['content'])})
+        else:
+            input_msgs.append({'role': 'user', 'content': self.prepare_itlist(inputs)})
+        return input_msgs
+
+    def generate_inner(self, inputs, **kwargs):
+        input_msgs = self.prepare_inputs(inputs)
+        temperature = kwargs.pop('temperature', self.temperature)
+        max_tokens = kwargs.pop('max_tokens', self.max_tokens)
+
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=input_msgs,
+                temperature=temperature,
+                max_tokens=max_tokens,
+                n=1,
+                **kwargs
+            )
+            content = response.choices[0].message.content.strip()
+            return 0, content, response
+        except Exception as e:
+            self.logger.error(f"{type(e)}: {e}")
+            return -1, self.fail_msg, None
+
+    def get_image_token_len(self, img_path, detail='low'):
+        if detail == 'low':
+            return 85
+        width, height = Image.open(img_path).size
+        if width > 1024 or height > 1024:
+            scale = 1024 / max(width, height)
+            width = int(width * scale)
+            height = int(height * scale)
+        h = -(-height // 512)
+        w = -(-width // 512)
+        return 85 + 170 * h * w
+
+    def get_token_len(self, inputs):
+        import tiktoken
+        try:
+            enc = tiktoken.encoding_for_model(self.model)
+        except Exception as err:
+            if 'gpt' in self.model:
+                self.logger.warning(f'{type(err)}: {err}')
+                enc = tiktoken.encoding_for_model('gpt-4')
+            else:
+                return 0
+        tot = 0
+        for item in inputs:
+            if 'role' in item:
+                tot += self.get_token_len(item['content'])
+            elif item['type'] == 'text':
+                tot += len(enc.encode(item['value']))
+            elif item['type'] == 'image':
+                tot += self.get_image_token_len(item['value'], self.img_detail)
+        return tot
+
+class GPT4V(OpenAIWrapper):
+    def generate(self, message, dataset=None):
+        return super(GPT4V, self).generate(message)
