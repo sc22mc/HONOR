@@ -1,2 +1,13 @@
-(torch_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/HONOR_TEST4# curl https://api.openai.com/v1/models
-curl: (35) error:0A00010B:SSL routines::wrong version number
+import openai
+
+openai.api_key = "sk-..."  # 替换为你的 key
+openai.base_url = "https://api.openai.com/v1"
+
+try:
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[{"role": "user", "content": "Hello"}],
+    )
+    print(response.choices[0].message.content)
+except Exception as e:
+    print(type(e), e)
