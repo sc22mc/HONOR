@@ -1,35 +1,123 @@
-# .env 文件，将其放置在 $VLMEvalKit 下
-# 专有 VLMs 的 API 密钥
-# QwenVL APIs
-# DASHSCOPE_API_KEY='sk-84644e28eb0042b7963e85db8c377020'
-# Gemini w. Google Cloud Backends
-GOOGLE_API_KEY=
-# OpenAI API
-OPENAI_API_KEY=sk-123456
-OPENAI_API_BASE=http://0.0.0.0:23333/v1/chat/completions
-LOCAL_LLM=/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/models/Qwen2.5-7B-Instruct
-# StepAI API
-STEPAI_API_KEY=
-# REKA API
-REKA_API_KEY=
-# GLMV API
-GLMV_API_KEY=
-# CongRong API
-CW_API_BASE=
-CW_API_KEY=
-# SenseChat-V API
-SENSECHAT_AK=
-SENSECHAT_SK=
-# Hunyuan-Vision API
-HUNYUAN_SECRET_KEY=
-HUNYUAN_SECRET_ID=
-# 你可以设置一个评估时代理，评估阶段产生的 API 调用将通过这个代理进行
-EVAL_PROXY=
-# 本地的评估模型地址
-# EVAL_MODEL_PATH='/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/models/Qwen2.5-7B-Instruct'
+帮我看一下#!/bin/bash
+set -x  # 开启调试输出
+
+# 设置 NCCL 环境变量（单卡也可以保留，兼容性好）
+export NCCL_IB_DISABLE=0
+export NCCL_P2P_DISABLE=0
+export NCCL_SOCKET_IFNAME=eth0
+
+# 固定模型和数据路径
+MODEL_PATH="/opt/nas/p/mm/ie_env/cmx/HONOR_TEST3/models/CPT"
+MODEL_TYPE="qwen2_vl"
+DATA_PATH="/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/finish_android_control_test_ll.jsonl"
+OUTPUT_DIR="/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/CPT0807/infer_full_ll"
+RESULT_PATH="$OUTPUT_DIR/response_ac_ll_nothink.json"
+LOG_PATH="$OUTPUT_DIR/infer.log"
+
+# 创建输出目录
+mkdir -p "$OUTPUT_DIR"
+
+# 单卡推理
+CUDA_VISIBLE_DEVICES=0 swift infer \
+    --model "$MODEL_PATH" \
+    --model_type "$MODEL_TYPE" \
+    --val_dataset "$DATA_PATH" \
+    --infer_backend pt \
+    --max_batch_size 1 \
+    --temperature 0 \
+    --result_path "$RESULT_PATH" \
+    --max_new_tokens 512 &> "$LOG_PATH"
 
 
+和
 
-# 数据集缓存路径
-# LMUData='/opt/nas/p/mm/ie_env/HONOR/LMUData'
+set -x
+
+# 设置数据缓存路径到非共享目录，否则可能出现读写冲突
+# export HF_HOME="/opt/nas/p/mm/ie_env/minqi/train_qwen/data_cache"
+
+# 环境变量设置，查询NCCL相关信息通过vc -nccl list
+# export CUDA_DEVICE_MAX_CONNECTIONS=1
+# export NCCL_SOCKET_IFNAME=eth0
+# export NCCL_IB_DISABLE=0
+# export NCCL_P2P_DISABLE=0
+# export NCCL_IB_TIMEOUT=22
+# export NCCL_IB_GID_INDEX=3
+# export NCCL_IB_TC=160
+# export NCCL_NET_GDR_LEVEL=2
+# export NCCL_IB_HCA=mlx5_bond_0,mlx5_bond_1,mlx5_bond_2,mlx5_bond_3,mlx5_bond_4,mlx5_bond_5,mlx5_bond_6,mlx5_bond_7
+# export NCCL_ALGO=Ring
+# export MKL_SERVICE_FORCE_INTEL=1
+
+export NCCL_IB_DISABLE=0
+export NCCL_P2P_DISABLE=0
+export NCCL_SOCKET_IFNAME=eth0
+
+
+for EVAL_DATA in "ac_hl_nothink" "ac_ll_nothink"
+do  
+    for MODEL_PATH_0 in ""/opt/nas/p/dongshaokang/fundmental_model/ui_agent_data/gui_task_v630_lock_data/Qwen2-VL-7B_RPA_Aug_v630D_Finish_20250623""
+    do
+        if [[ $MODEL_PATH_0 == *"qwen2_5_vl"*  ]]; then
+            model_type="qwen2_5_vl"
+        elif [[ $MODEL_PATH_0 == *"500_steps_model"*  ]]; then
+            model_type="qwen2_5_vl"
+        else
+            model_type="qwen2_vl"
+        fi
+
+        if [ "$EVAL_DATA" == "ac_hl_nothink" ]; then
+            DATA_PATH_0="/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/finish_android_control_test_hl.jsonl"
+            OUTPUT_PATH="/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/CPT630D/infer_full_hl"
+        elif [ "$EVAL_DATA" == "ac_ll_nothink" ]; then
+            DATA_PATH_0="/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/finish_android_control_test_ll.jsonl"
+            OUTPUT_PATH="/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/CPT630D/infer_full_ll"
+        fi
+
+        # 训练设置
+        MODEL_PATH=$MODEL_PATH_0
+        DATA_PATH=$DATA_PATH_0
+
+        WORK_DIR="/opt/nas/p/dongshaokang/ms-swift-test-dynamic-training"
+        mkdir -p $OUTPUT_PATH
+        result_path=${OUTPUT_PATH}/response_${EVAL_DATA}.json
+
+        nproc_per_node=4
+        nnodes=1
+        node_rank=${1:-0}
+        PER_DEVICE_BATCH_SIZE=3
+        GRADIENT_ACC=4
+        # total_batch_size=$((PER_DEVICE_BATCH_SIZE * GRADIENT_ACC * nproc_per_node * nnodes))
+        
+        SUFFIX="inference-rank$node_rank"
+        NPROC_PER_NODE=${nproc_per_node} \
+        NNODES=${nnodes} \
+        NODE_RANK=${node_rank} \
+        MASTER_ADDR=10.80.67.176  \
+        MASTER_PORT=2576 \
+        MAX_PIXELS=602112 \
+        CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 \
+        swift infer \
+            --model $MODEL_PATH_0 \
+            --model_type $model_type \
+            --val_dataset $DATA_PATH_0 \
+            --infer_backend pt \
+            --max_batch_size $PER_DEVICE_BATCH_SIZE \
+            --temperature 0 \
+            --result_path $result_path \
+            --max_new_tokens 512 &> "$OUTPUT_PATH/$SUFFIX.log"
+        
+        GPU_USAGE=$(nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits -i 0)
+        MEMORY_INFO=$(nvidia-smi --query-gpu=memory.used --format=csv,noheader,nounits -i 0)
+        THRESHOLD=3
+        THRESHOLD_MEMORY=10000
+
+        while [ "$MEMORY_INFO" -gt "$THRESHOLD_MEMORY" ]
+        do
+            sleep 240
+            GPU_USAGE=$(nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits -i 0)
+            MEMORY_INFO=$(nvidia-smi --query-gpu=memory.used --format=csv,noheader,nounits -i 0)
+        done
+    done
+done这两段代码在推理时，除了模型不同，处理/opt/nas/p/dongshaokang/AgentCPM-GUI/eval/eval_data/android_control_honor_inital_test/finish_android_control_test_ll.jsonl的效果一样嘛？有没有第二段代码设置了影响输出的变量但是第一段代码没有考虑到？
 
