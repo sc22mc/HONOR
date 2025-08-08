@@ -1,0 +1,22 @@
+/*
+ * Copyright (c) Honor Device Co., Ltd. 2023-2023. All rights reserved.
+ */
+
+package com.hihonor.aipluginengine.llm.iface;
+
+/**
+ * 大模型推理结果流式返回接口
+ *
+ * @author x00026493
+ * @since 2023-08-26
+ */
+public interface LLMResultCallback {
+
+    /**
+     * 底层推理回调
+     *
+     * @param code 错误码
+     * @param result 解析结果
+     */
+    void onNativeCallBack(int code, String result);
+}
