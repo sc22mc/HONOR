@@ -1,0 +1,112 @@
+/*
+ * Copyright (c) Honor Device Co., Ltd. 2022-2022. All rights reserved.
+ */
+
+package com.hihonor.aipluginengine.llm.faith;
+
+import com.hihonor.aipluginengine.llm.iface.LLMResultCallback;
+
+/**
+ * d
+ * faith模型推理接口jni封装类
+ *
+ * @author z00013245
+ * @since 2022-06-14
+ */
+public class FaithInferWrapper {
+    static {
+        System.loadLibrary("tokenizer");
+        System.loadLibrary("re2");
+        System.loadLibrary("Qwen2Tokenizer");
+        System.loadLibrary("llm");
+
+    }
+
+    /**
+     * 构造函数
+     */
+    private FaithInferWrapper() {
+    }
+
+    /**
+     * 获取faith实例
+     *
+     * @return faith实例
+     */
+    public static FaithInferWrapper getInstance() {
+        return SingletonHolder.PROCESSOR;
+    }
+
+    /**
+     * 功能描述
+     *
+     * @author z00013245
+     * @since 2022-06-10
+     */
+    private static class SingletonHolder {
+        private static final FaithInferWrapper PROCESSOR = new FaithInferWrapper();
+    }
+
+    /**
+     * 卸载模型
+     *
+     * @param modelAddress 模型地址
+     * @return 执行结果，0为成功，其它为失败
+     */
+    public native int unloadModel(long[] modelAddress);
+
+    /**
+     * bolt version
+     *
+     * @return 版本返回结果
+     */
+    public native String version();
+
+    /**
+     * 加载大模型
+     *
+     * @param dataPaths 模型路径
+     * @return 指向模型的指针, 返回-1说明获取失败
+     */
+    public native long[] loadBigModelByPath(String[] dataPaths);
+
+    /**
+     * 推理大模型
+     *
+     * @param modelAddress      模型地址
+     * @param inputStr          输入字符串
+     * @param pathStr           模型路径字符串
+     * @param llmResultCallback 推理结果流式回调
+     * @return 返回结果
+     */
+    public native String inferBigModel(long[] modelAddress, byte[] inputStr, byte[] pathStr,
+                                       LLMResultCallback llmResultCallback);
+
+    /**
+     * 调节模型内存
+     *
+     * @param modelAddress 模型地址
+     * @param dataPaths    模型路径
+     * @param operateType  模型操作类型，加载0 卸载 1
+     * @param firstIndex   首个需要操作的模型索引
+     * @return 指向模型的指针, 返回-1说明获取失败
+     */
+    public native long[] adjustModel(long[] modelAddress, String[] dataPaths, int operateType, int firstIndex);
+
+    /**
+     * 停止推理
+     *
+     * @return 停止结果
+     */
+    public native int stopCurTask();
+
+    /**
+     * 加载lora模型
+     *
+     * @param loraBlock0Path 第一个lora模型地址
+     * @param loraBlock1Path 第二个lora模型地址
+     * @param loraLmHeadPath lora的lmHead模型地址
+     * @return 返回结果
+     */
+    public native int setLoraByPath(String[] loraBlock0Path, String[] loraBlock1Path, String[] loraLmHeadPath);
+}
