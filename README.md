@@ -1,5 +1,5 @@
 <h1 align="center">
-    MAGICGUI: A FOUNDATIONAL MOBILE GUI AGENT WITH SCALABLE DATA PIPELINE AND REINFORCEMENT FINE-TUNING
+    MagicGUI: A Foundational Moblile GUI Agent with Scalable Data Pipeline and Reinforcement Fine-tuning
 </h1>
 
 <p align="center">
