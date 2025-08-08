@@ -26,7 +26,8 @@ python process_android_control.py
 ## gui-odyssey
 
 Download [GUI-Odyssey](https://github.com/OpenGVLab/GUI-Odyssey?tab=readme-ov-file) and save at ``MagicGUI/datasets/eval_data_process/tmp/GUI-Odyssey``. Copy [preprocessing.py](https://github.com/OpenGVLab/GUI-Odyssey/blob/master/data/preprocessing.py) and [format_converter.py](https://github.com/OpenGVLab/GUI-Odyssey/blob/master/data/format_converter.py) from the GUI-Odyssey repo to ``MagicGUI/datasets/eval_data_process/tmp/GUI-Odyssey``
-
+- `tmp/`: 
+  - `GUI-Odyssey/`：
 ```
 cd MagicGUI/datasets/eval_data_process/tmp/GUI-Odyssey
 python preprocessing.py
@@ -35,7 +36,10 @@ python ../../process_odyssey.py
 ```
 
 ## ScreenQA-short
-
+- `tmp/`: 
+  - `ScreenQA-short/`：
+    - `test-00000-of-00002.parquet`：
+    - `test-00001-of-00002.parquet`：
 Download [test subset of ScreenQA-short](https://huggingface.co/datasets/rootsautomation/RICO-ScreenQA-Short/tree/main/data) and save at ``MagicGUI/datasets/eval_data_process/tmp/ScreenQA-short``
 
 ```
