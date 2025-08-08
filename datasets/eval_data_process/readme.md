@@ -39,5 +39,5 @@ Download [test subset of ScreenQA-short](https://huggingface.co/datasets/rootsau
 
 ```
 cd MagicGUI/datasets/eval_data_process
-python process_android_control.py
+python process_screenqa.py
 ```
