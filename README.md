@@ -11,7 +11,7 @@
   <a href="#quick-start">Quick Start</a> •
   <a href="https://huggingface.co/openbmb/AgentCPM-GUI">Model</a> •
   <a href="#evaluation-data">Evaluation Data</a> •
-  <a href="https://arxiv.org/abs/2506.01391">Technical Report</a>
+  <a href="https://arxiv.org/abs/2508.03700">Technical Report</a>
 </p>
 
 ## News（链接需要修改）
