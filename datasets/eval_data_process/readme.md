@@ -15,8 +15,9 @@ cd android_env; pip install .
 
 ## Android Control
 
-Download [Android Control](https://github.com/google-research/google-research/tree/master/android_control) and save at ``MagicGUI/datasets/eval_data_process/tmp/android_control``
-
+Download [Android Control](https://github.com/google-research/google-research/tree/master/android_control) and save at ``MagicGUI/datasets/eval_data_process/tmp/android_control`` 
+- `tmp/`: 
+  - `android_control/`：
 ```
 cd MagicGUI/datasets/eval_data_process
 python process_android_control.py
