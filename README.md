@@ -1,6 +1,6 @@
-<h1 align="center">
-    MagicGUI: A Foundational Moblile GUI Agent with Scalable Data Pipeline and Reinforcement Fine-tuning
-</h1>
+<div align="center">
+  <img src="./assets/MagicGUI_logo.png" width="600em"></img>
+</div>
 
 <p align="center">
     【English | <a href="README_zh.md">中文</a>】
@@ -8,13 +8,16 @@
 
 <p align="center">
   <a href="#overview">Overview</a> •
+  <a href="#framework">Framework</a> •
   <a href="#quick-start">Quick Start</a> •
   <a href="https://huggingface.co/openbmb/AgentCPM-GUI">Model</a> •
-  <a href="#evaluation-data">Evaluation Data</a> •
+  <a href="#action-space">Action Space</a> •
+  <a href="#evaluation">Evaluation</a> •
+  <a href="#performance-evaluation">Performance</a> •
   <a href="https://arxiv.org/abs/2508.03700">Technical Report</a>
 </p>
 
-## News（链接需要修改）
+## News
 
 * [2025-07-20] 📄📄📄 We have released the **technical report** of AgentCPM-GUI! Check it out [here](https://arxiv.org/abs/2508.03700).
 * [2025-07-20] 🚀🚀🚀 We have open-sourced **MagicGUI**, an on-device GUI agent capable of operating Chinese & English apps and equipped with RFT-enhanced reasoning abilities.
@@ -32,6 +35,20 @@ MagicGUI is an open-source GUI agent model developed by Honor, built on Qwen2-VL
 **Planning-Oriented Reasoning**: Implement a planning-oriented reasoning mechanism to improve the stability of task execution and enhance the accuracy of action decisions in dynamic environments.
 
 **Two-Stage Training Paradigm**: Strengthen core perception, localization, and navigation capabilities through Continued Pre-training (CPT), while enhancing model robustness and generalization via Reinforcement Fine-tuning (RFT).
+
+## Framework
+The overall training framework of our MagicGUI contains two stages:
+
+**Stage I**: Continue Pre-training (CPT), which involves training a
+foundational model on a large and diverse dataset followed by an annealing phase using a balanced and high-quality
+dataset.
+
+**Stage II**: Reinforcement Fine-tuning (RFT), aimed at further enhancing the
+model’s robustness and generalization capabilities.
+
+<div align="center">
+  <img src="./assets/framework.png" width="800em"></img>
+</div>
 
 ## Quick Start
 
@@ -191,35 +208,99 @@ Note that all keywords are **case-sensitive**, and we use **compact JSON** (i.e.
 </table>
 
 
-## Evaluation Data
-
-We provide **Magic-RICH dataset**, an evaluation benchmark for Chinese apps covering**step**, **grounding** and **action** tasks.
-See the dataset on [Hugging Face](https://example.com/dataset-download).
-
-## Evaluate
-### 1.Data Download
+## Evaluation
+### 1.Data preparation
 Please download the dataset from the subset from the [Magic-RICH dataset](https://example.com/dataset-download) and palce the folders into the .datasets/ directory.
 
 - `assets/`: 
 - `datasets/`: 
-  - `Agent_Data_QA_grounding/`：
-  - `one_grounding/`：
-  - `.../`：
+  - `Routine/`：
+  - `Instruction/`：
+  - `Complex/`：
+  - `Handing_Exception`:
 - `utils/`:
+
+For the preparation of other open-source datasets, please refer to [Other datasets preparation](README.md).
+
 ### 2. Param
 We use run_eval.py for evaluation.
 
-- `--data`: Name of a subset from the [Magic-RICH dataset](https://example.com/dataset-download)  
+- `--data`: Name of a eval dataset
 - `--model`: Path to the model  
 - `--work-dir (str, default to '.')`: Directory to save evaluation results  
 - `--mode (str, default: 'all', choices: ['all', 'infer'])`: If set to "all", the script performs both inference and evaluation; if set to "infer", it performs inference only.
+- `--eval_model_path (str, default: 'None')`:'Path to eval model (required if mode is 'all' and data is 'ScreenQA-short')'
 
 ### 3. Run
 ```python
-python run_eval.py --data one_grounding --model your_model_path --mode all
+# Referring Benchmark
+python run_eval.py --data ScreenQA-short --model MagicGUI_Path  --mode all --eval_model_path Eval_Model_Path
+python run_eval.py --data ScreenSpot_v2_mobile --model MagicGUI_Path  --mode all
+python run_eval.py --data Os-Atlas-mobile --model MagicGUI_Path  --mode all
+# Magic-RICH dataset
+python run_eval.py --data Routine --model MagicGUI_Path  --mode all
+python run_eval.py --data Complex --model MagicGUI_Path  --mode all
+python run_eval.py --data Instruction --model MagicGUI_Path  --mode all
+python run_eval.py --data Handling_Exception --model MagicGUI_Path  --mode all
+# Open-source AndroidControl and GUI-Odyssey
+python run_eval.py --data AC-Low --model MagicGUI_Path  --mode all
+python run_eval.py --data AC-High --model MagicGUI_Path  --mode all
+python run_eval.py --data GUI-Odyssey --model MagicGUI_Path  --mode all
 ```
 
 ## Performance Evaluation
+
+### Performance comparison on the Referring Benchmark
+<table>
+  <thead>
+    <tr>
+      <th rowspan="1">Agent Models</th>
+      <th colspan="1">ScreenQA-short</th>
+      <th colspan="1">ScreenSpot v2 mobile</th>
+      <th colspan="1">Os-Atlas-mobile</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Closed-source Models -->
+    <tr><td colspan="4"><em>Closed-source Models</em></td></tr>
+    <tr>
+      <td>GPT-4o (Hurst et al., 2024)</td>
+      <td>90.3</td><td>10.6</td><td>4.6</td>
+    </tr>
+    <tr>
+      <td>Gemini 2.0 (Pichai et al., 2024)</td>
+      <td>90.4</td><td>10.6</td><td>5.8</td>
+    </tr>
+    <!-- Open-source Models -->
+    <tr><td colspan="4"><em>Open-source Models</em></td></tr>
+    <tr>
+      <td>InternVL-2-8B (Chen et al., 2024)</td>
+      <td>88.4</td><td>4.2</td><td>2.4</td>
+    </tr>
+    <tr>
+      <td>Qwen2-VL-7B (Wang et al., 2024)</td>
+      <td>92.6</td><td>70.7</td><td>27.2</td>
+    </tr>
+    <tr>
+      <td>Qwen2.5-VL-7B (Bai et al., 2025)</td>
+      <td>92.1</td><td>56.1</td><td>26.6</td>
+    </tr>
+    <tr>
+      <td>UI-TARS-7B (Qin et al., 2025)</td>
+      <td><b>95.4</b></td><td>88.6</td><td>82.5</td>
+    </tr>
+    <tr>
+      <td>UI-TARS-1.5-7B (Seed, 2025)</td>
+      <td>93.0</td><td>85.8</td><td>79.3</td>
+    </tr>
+    <!-- MagicGUI -->
+    <tr style="background-color:#e8eafc;">
+      <td>MagicGUI-CPT</td>
+      <td>94.6</td><td><b>90.2</b></td><td><b>95.2</b></td>
+    </tr>
+  </tbody>
+</table>
+
 
 ### Performance comparison on the Magic-RICH dataset
 
@@ -420,12 +501,6 @@ python run_eval.py --data one_grounding --model your_model_path --mode all
     </tr>
   </tbody>
 </table>
-
-
-
-> \*Different train/test splits
-
-TM and EM stand for the **Type Match** and **Exact Match**, respectively. All evaluation data and code are open-sourced — see [here](eval) for details.
 
 ## License
 
