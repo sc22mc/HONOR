@@ -50,7 +50,8 @@ python process_screenqa.py
 ## ScreenSpot_v2_mobile
 
 Download [ScreenSpot_v2_mobile](https://huggingface.co/datasets/HongxinLi/ScreenSpot_v2) and save at ``MagicGUI/datasets/eval_data_process/tmp/ScreenSpot_v2_mobile``
-
+- `tmp/`: 
+  - `ScreenSpot-v2-mobile/`：
 ```
 cd MagicGUI/datasets/eval_data_process
 python process_screenspotv2.py
