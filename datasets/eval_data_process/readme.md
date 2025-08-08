@@ -67,5 +67,5 @@ Download [Os-Atlas-mobile-aw_mobile.json](https://huggingface.co/datasets/OS-Cop
 
 ```
 cd MagicGUI/datasets/eval_data_process
-python process_screenspotv2.py
+python process_os_atlas.py
 ```
