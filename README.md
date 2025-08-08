@@ -16,7 +16,7 @@
 
 ## News（链接需要修改）
 
-* [2025-07-20] 📄📄📄 We have released the **technical report** of AgentCPM-GUI! Check it out [here](https://arxiv.org/abs/2506.01391).
+* [2025-07-20] 📄📄📄 We have released the **technical report** of AgentCPM-GUI! Check it out [here](https://arxiv.org/abs/2508.03700).
 * [2025-07-20] 🚀🚀🚀 We have open-sourced **MagicGUI**, an on-device GUI agent capable of operating Chinese & English apps and equipped with RFT-enhanced reasoning abilities.
 
 ## Overview
