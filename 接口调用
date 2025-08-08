@@ -1,0 +1,90 @@
+端侧部署以及接口文档
+一。文件放置：（adb push 传送相关文件到手机）
+
+1. llm-4b下的.bin即模型文件，模型文件放置在某路径下，比如：/data/local/tmp，（注意！该目录下也要放config.json，4b模型忘传了，可复用1.5b的）
+
+2. vocab文件夹放置在模型文件同一级,比如/data/local/tmp/vocab
+
+3.static_dict文件夹放在vocab下，比如/data/local/tmp/vocab/static_dict
+
+4. 8750文件夹下的QNN及htp算子库放置固定路径（该路径如无写权限先对手机执行adb remount）
++ /product_h/lib64/llm/libQnnHtp.so
++ /product_h/lib64/llm/libQnnSystem.so
++ /product_h/lib64/llm/libQnnHtpV75Skel.so
++ /product_h/lib64/llm/libQnnHtpV75Stub.so
+
+5. so文件夹下的库全部打包到apk层，保证可链接即可
+至此完成部署
+
+二。接口调用：
+    /**
+     * 卸载模型
+     *
+     * @param modelAddress 模型地址
+     * @return 执行结果，0为成功，其它为失败
+     */
+    public native int unloadModel(long[] modelAddress);
+
+    /**
+     * bolt version
+     *
+     * @return 版本返回结果
+     */
+    public native String version();
+
+    /**
+     * 加载大模型
+     *
+     * @param dataPaths 模型路径
+     * @return 指向模型的指针, 返回-1说明获取失败
+     */
+    public native long[] loadBigModelByPath(String[] dataPaths);
+
+    /**
+     * 推理大模型
+     *
+     * @param modelAddress 模型地址
+     * @param inputStr 输入字符串
+     * @param pathStr 模型路径字符串
+     * @param llmResultCallback 推理结果流式回调
+     * @return 返回结果
+     */
+    public native String inferBigModel(long[] modelAddress, byte[] inputStr, byte[] pathStr,
+        LLMResultCallback llmResultCallback);
+
+    /**
+     * 调节模型内存
+     *
+     * @param modelAddress 模型地址
+     * @param dataPaths 模型路径
+     * @param operateType 模型操作类型，加载0 卸载 1
+     * @param firstIndex 首个需要操作的模型索引
+     * @return 指向模型的指针, 返回-1说明获取失败
+     */
+    public native long[] adjustModel(long[] modelAddress, String[] dataPaths, int operateType, int firstIndex);
+
+    /**
+     * 停止推理
+     *
+     * @return 停止结果
+     */
+    public native int stopCurTask();
+
+    /**
+     * 加载lora模型
+     *
+     * @param loraBlock0Path 第一个lora模型地址
+     * @param loraBlock1Path 第二个lora模型地址
+     * @param loraLmHeadPath lora的lmHead模型地址
+     * @return 返回结果
+     */
+    public native int setLoraByPath(String[] loraBlock0Path, String[] loraBlock1Path, String[] loraLmHeadPath);
+
+    /**
+     * 加载模型,并设置qnn路径
+     *
+     * @param dataPaths 模型路径
+     * @param qnnPath qnn路径
+     * @return 指向模型的指针, 返回-1说明获取失败
+     */
+    public native long[] loadBigModelByPathQNN(String[] dataPaths, byte[] qnnPath);
