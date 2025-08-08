@@ -36,12 +36,12 @@ python ../../process_odyssey.py
 ```
 
 ## ScreenQA-short
+
+Download [test subset of ScreenQA-short](https://huggingface.co/datasets/rootsautomation/RICO-ScreenQA-Short/tree/main/data) and save at ``MagicGUI/datasets/eval_data_process/tmp/ScreenQA-short``
 - `tmp/`: 
   - `ScreenQA-short/`：
     - `test-00000-of-00002.parquet`：
     - `test-00001-of-00002.parquet`：
-Download [test subset of ScreenQA-short](https://huggingface.co/datasets/rootsautomation/RICO-ScreenQA-Short/tree/main/data) and save at ``MagicGUI/datasets/eval_data_process/tmp/ScreenQA-short``
-
 ```
 cd MagicGUI/datasets/eval_data_process
 python process_screenqa.py
