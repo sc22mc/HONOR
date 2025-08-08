@@ -41,3 +41,21 @@ Download [test subset of ScreenQA-short](https://huggingface.co/datasets/rootsau
 cd MagicGUI/datasets/eval_data_process
 python process_screenqa.py
 ```
+
+## ScreenSpot_v2_mobile
+
+Download [ScreenSpot_v2_mobile](https://huggingface.co/datasets/HongxinLi/ScreenSpot_v2) and save at ``MagicGUI/datasets/eval_data_process/tmp/ScreenSpot_v2_mobile``
+
+```
+cd MagicGUI/datasets/eval_data_process
+python process_screenspotv2.py
+```
+
+## Os-Atlas-mobile
+
+Download [Os-Atlas-mobile-aw_mobile.json](https://huggingface.co/datasets/OS-Copilot/OS-Atlas-data/blob/main/mobile_domain/aw_mobile.json) and [Os-Atlas-mobile-images.zip](https://huggingface.co/datasets/OS-Copilot/OS-Atlas-data/blob/main/mobile_domain/mobile_images.zip) at ``MagicGUI/datasets/eval_data_process/tmp/Os-Atlas-mobile``, and unzip Os-Atlas-mobile-images.zip.
+
+```
+cd MagicGUI/datasets/eval_data_process
+python process_screenspotv2.py
+```
