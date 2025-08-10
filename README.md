@@ -504,7 +504,7 @@ python run_eval.py --data GUI-Odyssey --model MagicGUI_Path  --mode all
 
 ## License
 
-* Code in this repository is released under the [Apache-2.0](./LICENSE) license.
+* This project is licensed under the [Apache-2.0](./LICENSE) license. The model weights are fully open for academic research, and commercial use licenses can be applied for by contacting magicgui@honor.com. This project uses the pre-trained Qwen2VL-7B-Instruct for initialization, which is also licensed under the Apache- 2.0 License.
 
 ## Citation
 
