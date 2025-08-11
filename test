@@ -1,8 +1,11 @@
 (base) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/magicgui# git push
+Enumerating objects: 57, done.
+Counting objects: 100% (57/57), done.
+Delta compression using up to 384 threads
+Compressing objects: 100% (54/54), done.
+Writing objects: 100% (56/56), 15.71 MiB | 2.43 MiB/s, done.
+Total 56 (delta 3), reused 1 (delta 0), pack-reused 0
+remote: GitLab: You are not allowed to push code to protected branches on this project.
 To http://gitlab-y.ipd.hihonor.com/t00031716/magicgui.git
- ! [rejected]        master -> master (non-fast-forward)
+ ! [remote rejected] master -> master (pre-receive hook declined)
 error: failed to push some refs to 'http://gitlab-y.ipd.hihonor.com/t00031716/magicgui.git'
-hint: Updates were rejected because the tip of your current branch is behind
-hint: its remote counterpart. Integrate the remote changes (e.g.
-hint: 'git pull ...') before pushing again.
-hint: See the 'Note about fast-forwards' in 'git push --help' for details.
