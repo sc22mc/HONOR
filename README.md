@@ -214,10 +214,10 @@ Please download the dataset from the subset from the [Magic-RICH dataset](https:
 
 - `assets/` 
 - `datasets/` 
-  - `Routine/`
-  - `Instruction/`
-  - `Complex/`
-  - `Handing_Exception`:
+  - `Routine`
+  - `Instruction`
+  - `Complex`
+  - `Handing_Exception`
 - `utils/`
 
 For the preparation of other open-source datasets, please refer to [Other datasets preparation](datasets/eval_data_process/readme.md).
