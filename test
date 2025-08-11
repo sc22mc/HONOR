@@ -1,11 +1,109 @@
-(base) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/magicgui# git push
-Enumerating objects: 57, done.
-Counting objects: 100% (57/57), done.
-Delta compression using up to 384 threads
-Compressing objects: 100% (54/54), done.
-Writing objects: 100% (56/56), 15.71 MiB | 2.43 MiB/s, done.
-Total 56 (delta 3), reused 1 (delta 0), pack-reused 0
-remote: GitLab: You are not allowed to push code to protected branches on this project.
-To http://gitlab-y.ipd.hihonor.com/t00031716/magicgui.git
- ! [remote rejected] master -> master (pre-receive hook declined)
-error: failed to push some refs to 'http://gitlab-y.ipd.hihonor.com/t00031716/magicgui.git'
+import os
+import json
+import pandas as pd
+
+def convert_xlsx_to_jsonl(xlsx_file):
+    df = pd.read_excel(xlsx_file)
+
+    if not {"images", "prediction"}.issubset(df.columns):
+        raise ValueError("Excel must include 'images' 和 'prediction' 两列")
+
+    jsonl_file = os.path.splitext(xlsx_file)[0] + ".jsonl"
+
+    with open(jsonl_file, "w", encoding="utf-8") as f:
+        for _, row in df.iterrows():
+            image_path = row["images"]
+            image_name = os.path.basename(image_path)
+
+            item = {
+                "images": [{"path": image_name}],
+                "response": row["prediction"]
+            }
+
+            json_line = json.dumps(item, ensure_ascii=False)
+            f.write(json_line + "\n")
+
+    print(f"Saved to {jsonl_file}")
+    return jsonl_file
+
+
+def convert_to_template(template_path, input_file, outout_file):
+    f = open(template_path).readlines()
+
+    input_list = []
+    for item in f:
+        item = json.loads(item)
+        input_list.append(item)
+
+    compare_list = {}
+
+    f = open(input_file).readlines()
+    for item in f:
+        item = json.loads(item)
+        compare_list[item["images"][0]["path"][:-2]] = item["response"]
+
+    for item in input_list:
+        img = item["image_path"]
+        response = compare_list[img]
+
+        if "before_trans" in item:
+            before_trans = item["before_trans"]
+            item["before_trans"] = response
+            item["generate_content"] = item["generate_content"].replace(before_trans, response)
+
+        result = {"STATUS": "continue"}
+        
+        # auxiliary function to extract coordinates
+        def extract_coords(s):
+            # directly find and extract the coordinates in the parentheses
+            start = s.find("(")
+            end = s.find(")")
+            if start != -1 and end != -1:
+                coords_str = s[start+1:end].strip()  # extract the content in (x,y)
+                x, y = coords_str.split(",")
+                return [int(x), int(y)]
+            raise ValueError(f"Cannot find coordinates in the string: {s}")
+        
+        if "tap(" in response:
+            result["POINT"] = extract_coords(response)
+            
+        elif "long_press(" in response:
+            result["POINT"] = extract_coords(response)
+            result["duration"] = 1000
+                
+        elif "text(" in response:
+            content = response.split(",")[-1][:-1]
+            result["TYPE"] = content
+            
+        elif "scroll(" in response:
+            direction = response.split(",")[-1][:-1]
+            result["POINT"] = [0, 0]  # screen center point
+            result["to"] = direction
+        elif "navigate_back" in response:
+            result["PRESS"] = "BACK"
+
+        elif "navigate_home" in response:
+             result["PRESS"] = "HOME"
+
+        elif "wait()" in response:
+            result["duration"] = 500
+    
+        elif "finish()" in response or "Finish()" in response:
+            result["STATUS"] = "finish"
+
+        else:
+            # print(response)
+            pass
+
+        item["pred"] = result
+
+    outout_path = "/".join(outout_file.split("/")[:-1])
+    if not os.path.exists(outout_path):
+        os.makedirs(outout_path)
+    
+    with open(outout_file, 'w', encoding='utf-8') as f:
+        for item in input_list:
+            json_line = json.dumps(item, ensure_ascii=False)
+            f.write(json_line + '\n')这段代码哪里可能会导致-> convert_to_template(template_file_path, model_infer_output_path, model_infer_output_path_modified)
+(Pdb) n
+ValueError: invalid literal for int() with base 10: '0.5'
