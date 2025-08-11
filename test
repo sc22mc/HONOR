@@ -1,19 +1,40 @@
-(base) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/HONOR_TEST4# python ac.py 
-✅ 从 /opt/nas/p/mm/ie_env/cmx/HONOR_TEST4/datasets/AC-High/AC-High.jsonl 提取到 28 个唯一 key
-Traceback (most recent call last):
-  File "/opt/nas/p/mm/ie_env/cmx/HONOR_TEST4/ac.py", line 52, in <module>
-    filter_jsonl_by_images("/opt/nas/p/mm/ie_env/cmx/HONOR_TEST4/datasets/AC-High/AC-High.jsonl", "/opt/nas/p/mm/ie_env/cmx/HONOR_TEST4/utils/eval/AC-High_template.jsonl")
-  File "/opt/nas/p/mm/ie_env/cmx/HONOR_TEST4/ac.py", line 35, in filter_jsonl_by_images
-    obj = json.loads(line)
-          ^^^^^^^^^^^^^^^^
-  File "/opt/conda/lib/python3.11/json/__init__.py", line 346, in loads
-    return _default_decoder.decode(s)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/conda/lib/python3.11/json/decoder.py", line 337, in decode
-    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/conda/lib/python3.11/json/decoder.py", line 353, in raw_decode
-    obj, end = self.scan_once(s, idx)
-               ^^^^^^^^^^^^^^^^^^^^^^
-json.decoder.JSONDecodeError: Unterminated string starting at: line 1 column 34964 (char 34963)
-(base) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/HONOR_TEST4# 
+import json
+import re
+
+def filter_jsonl_by_images(jsonl_path_1, jsonl_path_2):
+    # 提取第一个 JSONL 文件中的 key（下划线前的数字）
+    keys = set()
+    with open(jsonl_path_1, "r", encoding="utf-8") as f:
+        for line in f:
+            obj = json.loads(line)
+            if "images" in obj and obj["images"]:
+                filename = obj["images"][0]
+                match = re.match(r"(\d+)_\d+\.png", filename)
+                if match:
+                    keys.add(match.group(1))
+    print(f"✅ 从 {jsonl_path_1} 提取到 {len(keys)} 个唯一 key")
+
+    # 读取第二个 JSONL，保留匹配到 key 的行
+    kept_lines = []
+    with open(jsonl_path_2, "r", encoding="utf-8") as f:
+        for line in f:
+            try:
+                obj = json.loads(line)
+            except json.JSONDecodeError:
+                print(f"⚠️ 跳过无效 JSON 行: {line[:100]}...")
+                continue
+            if "image_path" in obj:
+                match = re.match(r"(\d+)_\d+\.png", obj["image_path"])
+                if match and match.group(1) in keys:
+                    kept_lines.append(line)
+
+    # 覆盖写回第二个 JSONL
+    with open(jsonl_path_2, "w", encoding="utf-8") as f:
+        f.writelines(kept_lines)
+    print(f"✅ 已更新 {jsonl_path_2}，保留 {len(kept_lines)} 行")
+
+# 示例调用
+filter_jsonl_by_images(
+    "/path/to/file1.jsonl",
+    "/path/to/file2.jsonl"
+)
