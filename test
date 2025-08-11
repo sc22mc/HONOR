@@ -1,23 +1,52 @@
-(base) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/magicgui# git pull origin master
-remote: Enumerating objects: 10, done.
-remote: Counting objects: 100% (10/10), done.
-remote: Compressing objects: 100% (6/6), done.
-remote: Total 6 (delta 3), reused 0 (delta 0), pack-reused 0
-Unpacking objects: 100% (6/6), 4.98 KiB | 3.00 KiB/s, done.
-From http://gitlab-y.ipd.hihonor.com/t00031716/magicgui
- * branch            master     -> FETCH_HEAD
-   d2ecbb9..ccf18eb  master     -> origin/master
-hint: You have divergent branches and need to specify how to reconcile them.
-hint: You can do so by running one of the following commands sometime before
-hint: your next pull:
-hint: 
-hint:   git config pull.rebase false  # merge (the default strategy)
-hint:   git config pull.rebase true   # rebase
-hint:   git config pull.ff only       # fast-forward only
-hint: 
-hint: You can replace "git config" with "git config --global" to set a default
-hint: preference for all repositories. You can also pass --rebase, --no-rebase,
-hint: or --ff-only on the command line to override the configured default per
-hint: invocation.
-fatal: Need to specify how to reconcile divergent branches.
-(base) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/magicgui# 
+import json
+import re
+
+def filter_jsonl_by_images(jsonl1_path, jsonl2_path):
+    """
+    根据第一个 jsonl 文件里的 images 列表（只有一个元素）提取 screenshot_数字 作为 key，
+    然后过滤第二个 jsonl 文件，只保留 image_path 中包含这些 key 的行，并直接覆盖原文件。
+
+    :param jsonl1_path: 第一个 jsonl 文件路径
+    :param jsonl2_path: 第二个 jsonl 文件路径（会被原地修改）
+    """
+
+    # 1. 从第一个 jsonl 提取 screenshot_数字 部分
+    keys_set = set()
+    pattern = re.compile(r"(screenshot_\d+)_\d+\.png")
+
+    with open(jsonl1_path, "r", encoding="utf-8") as f1:
+        for line in f1:
+            if not line.strip():
+                continue
+            obj = json.loads(line)
+            if "images" in obj and obj["images"]:
+                match = pattern.match(obj["images"][0])
+                if match:
+                    keys_set.add(match.group(1))
+
+    print(f"✅ 从 {jsonl1_path} 提取到 {len(keys_set)} 个唯一 key")
+
+    # 2. 过滤第二个 jsonl
+    filtered_lines = []
+    with open(jsonl2_path, "r", encoding="utf-8") as f2:
+        for line in f2:
+            if not line.strip():
+                continue
+            obj = json.loads(line)
+            image_path = obj.get("image_path", "")
+            match = pattern.match(image_path)
+            if match and match.group(1) in keys_set:
+                filtered_lines.append(json.dumps(obj, ensure_ascii=False))
+
+    print(f"✅ {jsonl2_path} 中保留 {len(filtered_lines)} 行")
+
+    # 3. 覆盖写回第二个文件
+    with open(jsonl2_path, "w", encoding="utf-8") as f2:
+        for line in filtered_lines:
+            f2.write(line + "\n")
+
+    print("🎯 处理完成！")
+
+
+# 使用示例
+# filter_jsonl_by_images("file1.jsonl", "file2.jsonl")
