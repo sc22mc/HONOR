@@ -212,13 +212,13 @@ Note that all keywords are **case-sensitive**, and we use **compact JSON** (i.e.
 ### 1.Data preparation
 Please download the dataset from the subset from the [Magic-RICH dataset](https://example.com/dataset-download) and palce the folders into the .datasets/ directory.
 
-- `assets/`: 
-- `datasets/`: 
-  - `Routine/`：
-  - `Instruction/`：
-  - `Complex/`：
+- `assets/` 
+- `datasets/` 
+  - `Routine/`
+  - `Instruction/`
+  - `Complex/`
   - `Handing_Exception`:
-- `utils/`:
+- `utils/`
 
 For the preparation of other open-source datasets, please refer to [Other datasets preparation](datasets/eval_data_process/readme.md).
 
