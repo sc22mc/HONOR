@@ -9,3 +9,9 @@ Writing objects: 100% (2541/2541), 2.19 GiB | 5.84 MiB/s, done.
 Total 2541 (delta 6), reused 0 (delta 0), pack-reused 0
 fatal: the remote end hung up unexpectedly
 Everything up-to-date
+(process_data_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/magicgui/Magic-RICH# git lfs install
+git: 'lfs' is not a git command. See 'git --help'.
+                                                                                                                                                                                                                                                                   "mm-fudan-chai-l20-1-0" 10:08 19-Aug-25
+The most similar command is
+        log
+(process_data_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/magicgui/Magic-RICH# 
