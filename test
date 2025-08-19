@@ -1,3 +1,30 @@
+(process_data_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/magicgui/Magic-RICH# huggingface-cli login --add-to-git-credential
+⚠️  Warning: 'huggingface-cli login' is deprecated. Use 'hf auth login' instead.
+
+    _|    _|  _|    _|    _|_|_|    _|_|_|  _|_|_|  _|      _|    _|_|_|      _|_|_|_|    _|_|      _|_|_|  _|_|_|_|
+    _|    _|  _|    _|  _|        _|          _|    _|_|    _|  _|            _|        _|    _|  _|        _|
+    _|_|_|_|  _|    _|  _|  _|_|  _|  _|_|    _|    _|  _|  _|  _|  _|_|      _|_|_|    _|_|_|_|  _|        _|_|_|
+    _|    _|  _|    _|  _|    _|  _|    _|    _|    _|    _|_|  _|    _|      _|        _|    _|  _|        _|
+    _|    _|    _|_|      _|_|_|    _|_|_|  _|_|_|  _|      _|    _|_|_|      _|        _|    _|    _|_|_|  _|_|_|_|
+
+    A token is already saved on your machine. Run `hf auth whoami` to get more information or `hf auth logout` if you want to log out.
+    Setting a new token will erase the existing one.
+    To log in, `huggingface_hub` requires a token generated from https://huggingface.co/settings/tokens .
+Enter your token (input will not be visible): 
+Add token as git credential? (Y/n) y
+Token is valid (permission: fineGrained).
+The token `magicrich` has been saved to /root/.cache/huggingface/stored_tokens
+Cannot authenticate through git-credential as no helper is defined on your machine.
+You might have to re-authenticate when pushing to the Hugging Face Hub.
+Run the following command in your terminal in case you want to set the 'store' credential helper as default.
+
+git config --global credential.helper store
+
+Read https://git-scm.com/book/en/v2/Git-Tools-Credential-Storage for more details.
+Token has not been saved to git credential helper.
+Your token has been saved to /root/.cache/huggingface/token
+Login successful.
+The current active token is: `magicrich`
 (process_data_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/magicgui/Magic-RICH# git push
 Missing or invalid credentials.
 Error: connect ECONNREFUSED /tmp/vscode-git-62e6bccc00.sock
@@ -17,9 +44,3 @@ Error: connect ECONNREFUSED /tmp/vscode-git-62e6bccc00.sock
 }
 remote: Invalid username or password.
 fatal: Authentication failed for 'https://huggingface.co/datasets/GUIAgent/Magic-RICH/'
-(process_data_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/magicgui/Magic-RICH# git status
-On branch main
-Your branch is ahead of 'origin/main' by 1 commit.
-  (use "git push" to publish your local commits)
-
-nothing to commit, working tree clean
