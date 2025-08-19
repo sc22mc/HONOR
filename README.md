@@ -211,7 +211,7 @@ Note that all keywords are **case-sensitive**, and we use **compact JSON** (i.e.
 
 ## Evaluation
 ### 1.Data preparation
-Please download the dataset from the subset from the [Magic-RICH dataset](https://huggingface.co/datasets/GUIAgent/Magic-RICH) and palce the folders into the .datasets/ directory.
+Please download the dataset from the subset from the [Magic-RICH dataset](https://example.com/dataset-download) and palce the folders into the .datasets/ directory.
 
 - `assets/` 
 - `datasets/` 
