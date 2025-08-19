@@ -1,3 +1,23 @@
+(process_data_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/magicgui/Magic-RICH# apt-get install -y git-lfs
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+The following NEW packages will be installed:
+  git-lfs
+0 upgraded, 1 newly installed, 0 to remove and 78 not upgraded.
+Need to get 3,544 kB of archives.
+After this operation, 10.5 MB of additional disk space will be used.
+Get:1 http://aptps.cloud.hihonor.com/repository/apt-proxy jammy-updates/universe amd64 git-lfs amd64 3.0.2-1ubuntu0.3 [3,544 kB]
+Fetched 3,544 kB in 0s (10.5 MB/s)
+debconf: delaying package configuration, since apt-utils is not installed
+Selecting previously unselected package git-lfs.
+(Reading database ... 24179 files and directories currently installed.)
+Preparing to unpack .../git-lfs_3.0.2-1ubuntu0.3_amd64.deb ...
+Unpacking git-lfs (3.0.2-1ubuntu0.3) ...
+Setting up git-lfs (3.0.2-1ubuntu0.3) ...
+(process_data_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/magicgui/Magic-RICH# git lfs install
+Updated git hooks.
+Git LFS initialized.
 (process_data_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/magicgui/Magic-RICH# git push
 Enumerating objects: 2542, done.
 Counting objects: 100% (2542/2542), done.
@@ -5,13 +25,8 @@ Delta compression using up to 384 threads
 Compressing objects: 100% (2541/2541), done.
 error: RPC failed; HTTP 408 curl 22 The requested URL returned error: 408
 send-pack: unexpected disconnect while reading sideband packet
-Writing objects: 100% (2541/2541), 2.19 GiB | 5.84 MiB/s, done.
+Writing objects: 100% (2541/2541), 2.19 GiB | 5.85 MiB/s, done.
 Total 2541 (delta 6), reused 0 (delta 0), pack-reused 0
 fatal: the remote end hung up unexpectedly
 Everything up-to-date
-(process_data_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/magicgui/Magic-RICH# git lfs install
-git: 'lfs' is not a git command. See 'git --help'.
-                                                                                                                                                                                                                                                                   "mm-fudan-chai-l20-1-0" 10:08 19-Aug-25
-The most similar command is
-        log
 (process_data_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/magicgui/Magic-RICH# 
