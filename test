@@ -1,46 +1,11 @@
-(process_data_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/magicgui/Magic-RICH# huggingface-cli login --add-to-git-credential
-⚠️  Warning: 'huggingface-cli login' is deprecated. Use 'hf auth login' instead.
-
-    _|    _|  _|    _|    _|_|_|    _|_|_|  _|_|_|  _|      _|    _|_|_|      _|_|_|_|    _|_|      _|_|_|  _|_|_|_|
-    _|    _|  _|    _|  _|        _|          _|    _|_|    _|  _|            _|        _|    _|  _|        _|
-    _|_|_|_|  _|    _|  _|  _|_|  _|  _|_|    _|    _|  _|  _|  _|  _|_|      _|_|_|    _|_|_|_|  _|        _|_|_|
-    _|    _|  _|    _|  _|    _|  _|    _|    _|    _|    _|_|  _|    _|      _|        _|    _|  _|        _|
-    _|    _|    _|_|      _|_|_|    _|_|_|  _|_|_|  _|      _|    _|_|_|      _|        _|    _|    _|_|_|  _|_|_|_|
-
-    A token is already saved on your machine. Run `hf auth whoami` to get more information or `hf auth logout` if you want to log out.
-    Setting a new token will erase the existing one.
-    To log in, `huggingface_hub` requires a token generated from https://huggingface.co/settings/tokens .
-Enter your token (input will not be visible): 
-Add token as git credential? (Y/n) y
-Token is valid (permission: fineGrained).
-The token `magicrich` has been saved to /root/.cache/huggingface/stored_tokens
-Cannot authenticate through git-credential as no helper is defined on your machine.
-You might have to re-authenticate when pushing to the Hugging Face Hub.
-Run the following command in your terminal in case you want to set the 'store' credential helper as default.
-
-git config --global credential.helper store
-
-Read https://git-scm.com/book/en/v2/Git-Tools-Credential-Storage for more details.
-Token has not been saved to git credential helper.
-Your token has been saved to /root/.cache/huggingface/token
-Login successful.
-The current active token is: `magicrich`
 (process_data_cmx) root@mm-fudan-chai-l20-1-0:/opt/nas/p/mm/ie_env/cmx/magicgui/Magic-RICH# git push
-Missing or invalid credentials.
-Error: connect ECONNREFUSED /tmp/vscode-git-62e6bccc00.sock
-    at PipeConnectWrap.afterConnect [as oncomplete] (node:net:1595:16) {
-  errno: -111,
-  code: 'ECONNREFUSED',
-  syscall: 'connect',
-  address: '/tmp/vscode-git-62e6bccc00.sock'
-}
-Missing or invalid credentials.
-Error: connect ECONNREFUSED /tmp/vscode-git-62e6bccc00.sock
-    at PipeConnectWrap.afterConnect [as oncomplete] (node:net:1595:16) {
-  errno: -111,
-  code: 'ECONNREFUSED',
-  syscall: 'connect',
-  address: '/tmp/vscode-git-62e6bccc00.sock'
-}
-remote: Invalid username or password.
-fatal: Authentication failed for 'https://huggingface.co/datasets/GUIAgent/Magic-RICH/'
+Enumerating objects: 2542, done.
+Counting objects: 100% (2542/2542), done.
+Delta compression using up to 384 threads
+Compressing objects: 100% (2541/2541), done.
+error: RPC failed; HTTP 408 curl 22 The requested URL returned error: 408
+send-pack: unexpected disconnect while reading sideband packet
+Writing objects: 100% (2541/2541), 2.19 GiB | 5.84 MiB/s, done.
+Total 2541 (delta 6), reused 0 (delta 0), pack-reused 0
+fatal: the remote end hung up unexpectedly
+Everything up-to-date
