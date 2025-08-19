@@ -1,10 +1,10 @@
-git lfs track "*.png" "*.jpg" "*.jpeg" "*.webp" "*.bmp" "*.tif" "*.tiff" \
-               "*.mp4" "*.avi" "*.mov" "*.mkv" \
-               "*.zip" "*.tar" "*.tar.gz" "*.gz" "*.7z" \
-               "*.npy" "*.npz" "*.pt" "*.pth" "*.bin" "*.ckpt" "*.safetensors" \
-               "*.parquet" "*.h5"
-git add .gitattributes
-git commit -m "track large files with Git LFS"
+git config lfs.concurrenttransfers 8
+git config lfs.activitytimeout 300
+git config lfs.tlskeepalive 300
+git config http.version HTTP/1.1
 
+# 若需免输账号密码（用户名用 __token__，密码是 hf_ 开头的 token）
+git config --global credential.helper store
+printf "https://__token__:hf_YOUR_TOKEN_HERE@huggingface.co\n" >> ~/.git-credentials
 
-git lfs migrate import --everything --above=50MB
+git push origin --force
