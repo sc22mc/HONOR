@@ -160,7 +160,7 @@ Note that all keywords are **case-sensitive**, and we use **compact JSON** (i.e.
       <td>–</td>
       <td><code>finish()</code></td>
     </tr>
-    <tr>w
+    <tr>
       <td><b>Wait</b></td>
       <td>Wait for several seconds</td>
       <td>–</td>
