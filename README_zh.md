@@ -106,7 +106,105 @@ print(response)
 
 注意：所有关键词 **区分大小写**，并使用 **紧凑 JSON**（无多余空格）。
 
-（此处保留动作表格，与英文版一致，仅翻译了说明）
+<table>
+  <thead>
+    <tr>
+      <th>Action</th>
+      <th>Description</th>
+      <th>Conditions for R<sub>acc</sub> = +2</th>
+      <th>Example</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><b>Tap</b></td>
+      <td>Click at coordinate (x, y)</td>
+      <td>dist([x, y], [x<sub>c</sub>, y<sub>c</sub>]) ≤ 14%</td>
+      <td><code>tap(x,y)</code></td>
+    </tr>
+    <tr>
+      <td><b>Scroll</b></td>
+      <td>Scroll at coordinate (x, y) with<br>direction up / down / left / right</td>
+      <td>dist([x, y], [x<sub>c</sub>, y<sub>c</sub>]) ≤ 14%<br>and direction = gt[direction]</td>
+      <td><code>scroll(x,y,direction)</code></td>
+    </tr>
+    <tr>
+      <td><b>Text Input</b></td>
+      <td>Type <i>text</i> at coordinate (x, y)</td>
+      <td>dist([x, y], [x<sub>c</sub>, y<sub>c</sub>]) ≤ 14%<br>and F1(text, gt[text]) > 0.5</td>
+      <td><code>text(x,y,text_input)</code></td>
+    </tr>
+    <tr>
+      <td><b>Navigation Back</b></td>
+      <td>Adb command to go back to the previous page</td>
+      <td>–</td>
+      <td><code>navigate_back()</code></td>
+    </tr>
+    <tr>
+      <td><b>Navigation Home</b></td>
+      <td>Adb command to go to the home screen of the mobile</td>
+      <td>–</td>
+      <td><code>navigate_home()</code></td>
+    </tr>
+    <tr>
+      <td><b>Long Press</b></td>
+      <td>Long press at coordinate (x, y)</td>
+      <td>dist([x, y], [x<sub>c</sub>, y<sub>c</sub>]) ≤ 14%</td>
+      <td><code>long_press(x,y)</code></td>
+    </tr>
+    <tr>
+      <td><b>Finish</b></td>
+      <td>Indicate that navigation task has been completed</td>
+      <td>–</td>
+      <td><code>finish()</code></td>
+    </tr>
+    <tr>
+      <td><b>Wait</b></td>
+      <td>Wait for several seconds</td>
+      <td>–</td>
+      <td><code>wait()</code></td>
+    </tr>
+    <tr>
+      <td><b>Enter</b></td>
+      <td>Adb command to press enter</td>
+      <td>–</td>
+      <td><code>enter()</code></td>
+    </tr>
+    <tr>
+      <td><b>Takeover</b></td>
+      <td>Request user takeover</td>
+      <td>–</td>
+      <td><code>take_over(message)</code></td>
+    </tr>
+    <tr>
+      <td><b>Drag</b></td>
+      <td>Drag from coordinate (x₁, y₁) to (x₂, y₂)</td>
+      <td>
+        dist([x₁, y₁], [x<sub>1c</sub>, y<sub>1c</sub>]) ≤ 7.5%<br>
+        and dist([x₂, y₂], [x<sub>2c</sub>, y<sub>2c</sub>]) ≤ 7.5%
+      </td>
+      <td><code>drag(x1,y1,x2,y2)</code></td>
+    </tr>
+    <tr>
+      <td><b>Call API</b></td>
+      <td>Adb command to <i>open</i> or <i>kill</i> app</td>
+      <td>app = gt[app]<br>and open/kill = gt[operation]</td>
+      <td><code>call_api(api_name,operation)</code></td>
+    </tr>
+    <tr>
+      <td><b>Screenshot</b></td>
+      <td>Adb command to take a screenshot</td>
+      <td>–</td>
+      <td><code>screen_shot()</code></td>
+    </tr>
+    <tr>
+      <td><b>Long Screenshot</b></td>
+      <td>Adb command to take a long screenshot</td>
+      <td>–</td>
+      <td><code>long_screen_shot()</code></td>
+    </tr>
+  </tbody>
+</table>
 
 ## 评测
 
