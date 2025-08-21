@@ -1,29 +1,36 @@
 def dump(data, f, **kwargs):
     def dump_pkl(data, pth, **kwargs):
-        fd = os.open(f, os.O_WRONLY | os.O_CREAT, 0o600) 
-        with os.fdopen(fd, 'wb') as f:
-            pickle.dump(data, f)
+        fd = os.open(pth, os.O_WRONLY | os.O_CREAT, 0o600) 
+        with os.fdopen(fd, 'wb') as fout:
+            pickle.dump(data, fout)
 
     def dump_json(data, pth, **kwargs):
-        fd = os.open(f, os.O_WRONLY | os.O_CREAT, 0o600) 
-        with os.fdopen(fd, 'w') as f:
-            json.dump(data, f, indent=4, ensure_ascii=False, cls=NumpyEncoder)
+        fd = os.open(pth, os.O_WRONLY | os.O_CREAT, 0o600) 
+        with os.fdopen(fd, 'w', encoding='utf-8') as fout:
+            json.dump(data, fout, indent=4, ensure_ascii=False, cls=NumpyEncoder)
 
-    def dump_jsonl(data, f, **kwargs):
+    def dump_jsonl(data, pth, **kwargs):
         lines = [json.dumps(x, ensure_ascii=False, cls=NumpyEncoder) for x in data]
-        fd = os.open(f, os.O_WRONLY | os.O_CREAT, 0o600) 
+        fd = os.open(pth, os.O_WRONLY | os.O_CREAT, 0o600) 
         with os.fdopen(fd, 'w', encoding='utf8') as fout:
             fout.write('\n'.join(lines))
 
-    def dump_xlsx(data, f, **kwargs):
-        data.to_excel(f, index=False, engine='xlsxwriter')
+    def dump_xlsx(data, pth, **kwargs):
+        data.to_excel(pth, index=False, engine='xlsxwriter')
 
-    def dump_csv(data, f, quoting=csv.QUOTE_ALL):
-        data.to_csv(f, index=False, encoding='utf-8', quoting=quoting)
+    def dump_csv(data, pth, quoting=csv.QUOTE_ALL):
+        data.to_csv(pth, index=False, encoding='utf-8', quoting=quoting)
 
-    def dump_tsv(data, f, quoting=csv.QUOTE_ALL):
-        data.to_csv(f, sep='\t', index=False, encoding='utf-8', quoting=quoting)
+    def dump_tsv(data, pth, quoting=csv.QUOTE_ALL):
+        data.to_csv(pth, sep='\t', index=False, encoding='utf-8', quoting=quoting)
 
-    handlers = dict(pkl=dump_pkl, json=dump_json, jsonl=dump_jsonl, xlsx=dump_xlsx, csv=dump_csv, tsv=dump_tsv)
+    handlers = dict(
+        pkl=dump_pkl,
+        json=dump_json,
+        jsonl=dump_jsonl,
+        xlsx=dump_xlsx,
+        csv=dump_csv,
+        tsv=dump_tsv,
+    )
     suffix = f.split('.')[-1]
     return handlers[suffix](data, f, **kwargs)
