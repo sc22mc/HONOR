@@ -1,44 +1,18 @@
-# LOAD & DUMP
-# def dump(data, f, **kwargs):
-#     def dump_pkl(data, pth, **kwargs):
-#         fd = os.open(data, os.O_WRONLY | os.O_CREAT, 0o600) 
-#         with os.fdopen(fd, 'wb') as f:
-#             pickle.dump(data, f)
-
-#     def dump_json(data, pth, **kwargs):
-#         fd = os.open(data, os.O_WRONLY | os.O_CREAT, 0o600) 
-#         with os.fdopen(fd, 'w') as f:
-#             json.dump(data, f, indent=4, ensure_ascii=False, cls=NumpyEncoder)
-
-#     def dump_jsonl(data, f, **kwargs):
-#         lines = [json.dumps(x, ensure_ascii=False, cls=NumpyEncoder) for x in data]
-#         fd = os.open(f, os.O_WRONLY | os.O_CREAT, 0o600) 
-#         with os.fdopen(fd, 'w', encoding='utf8') as fout:
-#             fout.write('\n'.join(lines))
-
-#     def dump_xlsx(data, f, **kwargs):
-#         data.to_excel(f, index=False, engine='xlsxwriter')
-
-#     def dump_csv(data, f, quoting=csv.QUOTE_ALL):
-#         data.to_csv(f, index=False, encoding='utf-8', quoting=quoting)
-
-#     def dump_tsv(data, f, quoting=csv.QUOTE_ALL):
-#         data.to_csv(f, sep='\t', index=False, encoding='utf-8', quoting=quoting)
-
-#     handlers = dict(pkl=dump_pkl, json=dump_json, jsonl=dump_jsonl, xlsx=dump_xlsx, csv=dump_csv, tsv=dump_tsv)
-#     suffix = f.split('.')[-1]
-#     return handlers[suffix](data, f, **kwargs)
-
 def dump(data, f, **kwargs):
     def dump_pkl(data, pth, **kwargs):
-        pickle.dump(data, open(pth, 'wb'))
+        fd = os.open(f, os.O_WRONLY | os.O_CREAT, 0o600) 
+        with os.fdopen(fd, 'wb') as f:
+            pickle.dump(data, f)
 
     def dump_json(data, pth, **kwargs):
-        json.dump(data, open(pth, 'w'), indent=4, ensure_ascii=False, cls=NumpyEncoder)
+        fd = os.open(f, os.O_WRONLY | os.O_CREAT, 0o600) 
+        with os.fdopen(fd, 'w') as f:
+            json.dump(data, f, indent=4, ensure_ascii=False, cls=NumpyEncoder)
 
     def dump_jsonl(data, f, **kwargs):
         lines = [json.dumps(x, ensure_ascii=False, cls=NumpyEncoder) for x in data]
-        with open(f, 'w', encoding='utf8') as fout:
+        fd = os.open(f, os.O_WRONLY | os.O_CREAT, 0o600) 
+        with os.fdopen(fd, 'w', encoding='utf8') as fout:
             fout.write('\n'.join(lines))
 
     def dump_xlsx(data, f, **kwargs):
